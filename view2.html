@@ -31,10 +31,7 @@
     }
     .menu-btn:hover,.icon-btn:hover{background:var(--hover)}
     .logo{display:flex;align-items:center;gap:5px;text-decoration:none;cursor:pointer}
-    .logo-icon{
-      width:34px;height:24px;background:var(--red);border-radius:6px;
-      display:flex;align-items:center;justify-content:center
-    }
+    .logo-icon{width:34px;height:24px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center}
     .logo-icon svg{width:14px;height:14px;fill:#fff}
     .logo-text{font-size:19px;font-weight:700;color:var(--txt);letter-spacing:-.5px}
     .search-wrap{flex:1;max-width:620px;margin:0 auto;display:flex;gap:8px;align-items:center}
@@ -105,6 +102,24 @@
     .vchan{font-size:13px;color:var(--txt2);margin-bottom:2px}
     .vstats{font-size:13px;color:var(--txt3)}
 
+    /* ── INFINITE SCROLL BOTTOM ── */
+    #sentinel{height:1px;margin:0 20px}
+    #bottomLoader{
+      display:none;align-items:center;justify-content:center;
+      gap:12px;padding:28px;color:var(--txt3);font-size:14px
+    }
+    #bottomLoader.show{display:flex}
+    .spin-sm{
+      width:28px;height:28px;border:3px solid var(--border);
+      border-top-color:var(--red);border-radius:50%;
+      animation:spin .7s linear infinite;flex-shrink:0
+    }
+    #endMsg{
+      display:none;text-align:center;padding:28px;
+      color:var(--txt3);font-size:14px;border-top:1px solid var(--border);margin:0 20px
+    }
+    #endMsg.show{display:block}
+
     /* ── MODAL ── */
     .overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.82);z-index:500;overflow-y:auto}
     .overlay.open{display:flex;align-items:flex-start;justify-content:center;padding:30px 16px}
@@ -153,7 +168,7 @@
     }
     .desc.open::after{opacity:0}
 
-    /* ── SETTINGS MODAL ── */
+    /* ── SETTINGS ── */
     .settings-overlay{
       display:none;position:fixed;inset:0;background:rgba(0,0,0,.7);
       z-index:800;align-items:center;justify-content:center
@@ -177,10 +192,7 @@
       font-size:15px;font-weight:600;cursor:pointer;transition:background .2s;font-family:inherit
     }
     .s-save:hover{background:var(--red2)}
-    .s-close{
-      position:absolute;top:14px;right:14px;background:none;border:none;
-      color:var(--txt2);cursor:pointer;font-size:22px;line-height:1
-    }
+    .s-close{position:absolute;top:14px;right:14px;background:none;border:none;color:var(--txt2);cursor:pointer;font-size:22px;line-height:1}
 
     /* ── STATES ── */
     .loader{display:flex;justify-content:center;padding:80px 0;grid-column:1/-1}
@@ -294,6 +306,14 @@
     </div>
     <div id="resultsHdr" class="results-hdr" style="display:none"></div>
     <div class="grid" id="grid"></div>
+
+    <!-- Infinite scroll trigger -->
+    <div id="sentinel"></div>
+    <div id="bottomLoader">
+      <div class="spin-sm"></div>
+      Loading more videos…
+    </div>
+    <div id="endMsg">You've reached the end</div>
   </main>
 </div>
 
@@ -307,16 +327,10 @@
       <div class="modal-row">
         <div class="modal-stats" id="mStats"></div>
         <div class="act-row">
-          <button class="act-btn" id="likeBtn">
-            <span class="material-icons">thumb_up</span><span id="likeLabel">Like</span>
-          </button>
+          <button class="act-btn"><span class="material-icons">thumb_up</span><span id="likeLabel">Like</span></button>
           <button class="act-btn"><span class="material-icons">thumb_down</span></button>
-          <button class="act-btn" onclick="shareVideo()">
-            <span class="material-icons">share</span><span>Share</span>
-          </button>
-          <button class="act-btn" onclick="openOnYT()">
-            <span class="material-icons">open_in_new</span><span>YouTube</span>
-          </button>
+          <button class="act-btn" onclick="shareVideo()"><span class="material-icons">share</span><span>Share</span></button>
+          <button class="act-btn" onclick="openOnYT()"><span class="material-icons">open_in_new</span><span>YouTube</span></button>
         </div>
       </div>
       <div class="modal-chan" id="mChan"></div>
@@ -337,17 +351,33 @@
 </div>
 
 <script>
-  // ── CONFIG ─────────────────────────────────────────────────────
+  // ── CONFIG ────────────────────────────────────────────────────
   const DEFAULT_KEY = 'AIzaSyCi7INFYXUr6uIZN6CE1V4jsA9LIqumkA8';
   let API_KEY = localStorage.getItem('vt_key') || DEFAULT_KEY;
-  let sidebarOpen = true;
-  let currentVideoId = '';
-  let lastAction = null; // for retry
 
-  // ── BOOT ───────────────────────────────────────────────────────
+  // ── SCROLL STATE ──────────────────────────────────────────────
+  let nextPageToken = '';   // YouTube pagination token
+  let isLoading = false;    // guard against concurrent fetches
+  let currentMode = 'home'; // 'home' | 'search'
+  let currentQuery = '';    // active search term
+  let hasMore = false;      // whether more pages exist
+
+  let currentVideoId = '';
+  let sidebarOpen = true;
+
+  // ── INTERSECTION OBSERVER for infinite scroll ─────────────────
+  const sentinel = document.getElementById('sentinel');
+  const scrollObserver = new IntersectionObserver(entries => {
+    if (entries[0].isIntersecting && hasMore && !isLoading) {
+      loadMore();
+    }
+  }, { rootMargin: '400px' }); // start loading 400px before hitting the bottom
+  scrollObserver.observe(sentinel);
+
+  // ── BOOT ──────────────────────────────────────────────────────
   window.addEventListener('DOMContentLoaded', goHome);
 
-  // ── SETTINGS ──────────────────────────────────────────────────
+  // ── SETTINGS ─────────────────────────────────────────────────
   function openSettings() {
     document.getElementById('keyInput').value = API_KEY;
     document.getElementById('settingsOverlay').classList.add('open');
@@ -360,8 +390,7 @@
     API_KEY = v;
     localStorage.setItem('vt_key', v);
     closeSettings();
-    if (lastAction) lastAction();
-    else goHome();
+    goHome();
   }
 
   // ── SIDEBAR ───────────────────────────────────────────────────
@@ -388,18 +417,10 @@
   // ── FETCH ─────────────────────────────────────────────────────
   async function yt(url) {
     let res;
-    try {
-      res = await fetch(url);
-    } catch (netErr) {
-      // Network-level failure (offline, CORS, etc.)
-      throw Object.assign(new Error('Network error — make sure you are online and the file is opened in a browser.'), { isNetwork: true });
-    }
+    try { res = await fetch(url); }
+    catch (e) { throw new Error('Network error — check your internet connection.'); }
     const data = await res.json();
-    if (data.error) {
-      const msg = data.error.message || 'YouTube API error';
-      const code = data.error.code || res.status;
-      throw Object.assign(new Error(`API error ${code}: ${msg}`), { apiError: true, code });
-    }
+    if (data.error) throw new Error(`API ${data.error.code}: ${data.error.message}`);
     return data;
   }
 
@@ -429,10 +450,27 @@
     return COLORS[Math.abs(h)%COLORS.length];
   }
 
-  // ── SKELETONS ─────────────────────────────────────────────────
+  // ── UI HELPERS ─────────────────────────────────────────────────
+  function setScrollState(token) {
+    nextPageToken = token || '';
+    hasMore = !!nextPageToken;
+    document.getElementById('bottomLoader').classList.toggle('show', false);
+    document.getElementById('endMsg').classList.toggle('show', !hasMore && document.querySelectorAll('.card').length > 0);
+  }
+
+  function showBottomLoader() {
+    document.getElementById('bottomLoader').classList.add('show');
+    document.getElementById('endMsg').classList.remove('show');
+  }
+  function hideBottomLoader() {
+    document.getElementById('bottomLoader').classList.remove('show');
+  }
+
   function skeletons(n=16) {
-    document.getElementById('resultsHdr').style.display='none';
-    document.getElementById('grid').innerHTML = Array.from({length:n},()=>`
+    document.getElementById('resultsHdr').style.display = 'none';
+    document.getElementById('endMsg').classList.remove('show');
+    document.getElementById('bottomLoader').classList.remove('show');
+    document.getElementById('grid').innerHTML = Array.from({length:n}, () => `
       <div class="skel">
         <div class="sk-thumb"></div>
         <div class="card-info">
@@ -446,33 +484,24 @@
       </div>`).join('');
   }
 
-  function showErr(msg, retry) {
-    lastAction = retry || null;
+  function showErr(msg) {
+    hideBottomLoader();
+    hasMore = false;
     document.getElementById('grid').innerHTML = `
       <div class="empty">
         <span class="material-icons">error_outline</span>
         <h3>Something went wrong</h3>
         <p>${msg}</p>
-        ${retry ? '<button class="retry-btn" onclick="lastAction && lastAction()">Try again</button>' : ''}
       </div>`;
   }
 
-  // ── RENDER ────────────────────────────────────────────────────
-  function render(videos, hdr='') {
+  // ── APPEND CARDS ──────────────────────────────────────────────
+  function appendCards(videos) {
     const grid = document.getElementById('grid');
-    const hdrEl = document.getElementById('resultsHdr');
-    grid.innerHTML = '';
-    hdrEl.style.display = hdr ? 'block' : 'none';
-    if (hdr) hdrEl.textContent = hdr;
-
-    if (!videos.length) {
-      grid.innerHTML = `<div class="empty"><span class="material-icons">search_off</span><h3>No results</h3><p>Try a different search term.</p></div>`;
-      return;
-    }
     videos.forEach(v => {
-      const sn = v.snippet||{};
-      const st = v.statistics||{};
-      const id = typeof v.id==='string' ? v.id : (v.id?.videoId||'');
+      const sn = v.snippet || {};
+      const st = v.statistics || {};
+      const id = typeof v.id === 'string' ? v.id : (v.id?.videoId || '');
       if (!id) return;
       const thumb = sn.thumbnails?.medium?.url || sn.thumbnails?.default?.url || '';
       const title = sn.title || '(no title)';
@@ -484,14 +513,14 @@
       card.className = 'card';
       card.innerHTML = `
         <div class="thumb-wrap">
-          <img class="thumb-img" src="${thumb}" alt="" loading="lazy" decoding="async" />
+          <img class="thumb-img" src="${thumb}" alt="" loading="lazy" decoding="async"/>
         </div>
         <div class="card-info">
           <div class="avatar" style="background:${bg}">${ini(chan)}</div>
           <div class="meta">
             <div class="vtitle">${title}</div>
             <div class="vchan">${chan}</div>
-            <div class="vstats">${[fmtViews(st.viewCount), pub?timeAgo(pub):''].filter(Boolean).join(' · ')}</div>
+            <div class="vstats">${[fmtViews(st.viewCount), pub ? timeAgo(pub) : ''].filter(Boolean).join(' · ')}</div>
           </div>
         </div>`;
       card.addEventListener('click', () => openVideo(id, v));
@@ -501,18 +530,27 @@
 
   // ── HOME ──────────────────────────────────────────────────────
   async function goHome() {
+    currentMode = 'home';
+    currentQuery = '';
+    nextPageToken = '';
+    hasMore = false;
     document.getElementById('searchBox').value = '';
+    document.getElementById('resultsHdr').style.display = 'none';
     document.title = 'ViewTube';
     document.getElementById('navHome')?.classList.add('active');
     skeletons();
-    lastAction = goHome;
+    isLoading = true;
     try {
       const d = await yt(
         `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=24&regionCode=US&key=${API_KEY}`
       );
-      render(d.items || []);
+      document.getElementById('grid').innerHTML = '';
+      appendCards(d.items || []);
+      setScrollState(d.nextPageToken);
     } catch(e) {
-      showErr(e.message, goHome);
+      showErr(e.message);
+    } finally {
+      isLoading = false;
     }
   }
 
@@ -524,30 +562,72 @@
   }
 
   async function runQuery(q) {
+    currentMode = 'search';
+    currentQuery = q;
+    nextPageToken = '';
+    hasMore = false;
     document.getElementById('searchBox').value = q;
     document.title = `${q} — ViewTube`;
+    const hdr = document.getElementById('resultsHdr');
+    hdr.style.display = 'block';
+    hdr.textContent = `Search results for "${q}"`;
     skeletons();
-    const action = () => runQuery(q);
-    lastAction = action;
+    isLoading = true;
     try {
-      const sd = await yt(
-        `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=24&order=relevance&key=${API_KEY}`
-      );
-      const items = sd.items || [];
-      const ids = items.map(i=>i.id?.videoId).filter(Boolean).join(',');
-      let statMap = {};
-      if (ids) {
-        const vd = await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);
-        (vd.items||[]).forEach(v => { statMap[v.id] = v.statistics; });
-      }
-      const enriched = items.map(i => ({
-        ...i,
-        id: i.id?.videoId,
-        statistics: statMap[i.id?.videoId] || {}
-      }));
-      render(enriched, `Search results for "${q}"`);
+      const result = await fetchSearch(q, '');
+      document.getElementById('grid').innerHTML = '';
+      appendCards(result.items);
+      setScrollState(result.nextPageToken);
     } catch(e) {
-      showErr(e.message, action);
+      showErr(e.message);
+    } finally {
+      isLoading = false;
+    }
+  }
+
+  async function fetchSearch(q, pageToken) {
+    const tokenParam = pageToken ? `&pageToken=${pageToken}` : '';
+    const sd = await yt(
+      `https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=24&order=relevance${tokenParam}&key=${API_KEY}`
+    );
+    const items = sd.items || [];
+    const ids = items.map(i => i.id?.videoId).filter(Boolean).join(',');
+    let statMap = {};
+    if (ids) {
+      const vd = await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);
+      (vd.items || []).forEach(v => { statMap[v.id] = v.statistics; });
+    }
+    const enriched = items.map(i => ({
+      ...i,
+      id: i.id?.videoId,
+      statistics: statMap[i.id?.videoId] || {}
+    }));
+    return { items: enriched, nextPageToken: sd.nextPageToken || '' };
+  }
+
+  // ── LOAD MORE (infinite scroll) ───────────────────────────────
+  async function loadMore() {
+    if (isLoading || !hasMore || !nextPageToken) return;
+    isLoading = true;
+    showBottomLoader();
+    try {
+      if (currentMode === 'home') {
+        const d = await yt(
+          `https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=24&regionCode=US&pageToken=${nextPageToken}&key=${API_KEY}`
+        );
+        appendCards(d.items || []);
+        setScrollState(d.nextPageToken);
+      } else {
+        const result = await fetchSearch(currentQuery, nextPageToken);
+        appendCards(result.items);
+        setScrollState(result.nextPageToken);
+      }
+    } catch(e) {
+      hideBottomLoader();
+      // Don't wipe the grid on a "load more" failure — just stop
+      hasMore = false;
+    } finally {
+      isLoading = false;
     }
   }
 
@@ -560,13 +640,13 @@
     const chan = sn.channelTitle || '';
     const bg = aColor(chan);
     const pubDate = sn.publishedAt
-      ? new Date(sn.publishedAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'})
+      ? new Date(sn.publishedAt).toLocaleDateString('en-US', {year:'numeric',month:'long',day:'numeric'})
       : '';
 
     document.getElementById('mTitle').textContent = sn.title || '';
     document.getElementById('mDesc').textContent = sn.description || 'No description.';
     document.getElementById('mDesc').classList.remove('open');
-    document.getElementById('mStats').textContent = [fmtViews(st.viewCount),pubDate].filter(Boolean).join(' · ');
+    document.getElementById('mStats').textContent = [fmtViews(st.viewCount), pubDate].filter(Boolean).join(' · ');
     document.getElementById('likeLabel').textContent = st.likeCount ? fmtN(st.likeCount) : 'Like';
     document.getElementById('mChan').innerHTML = `
       <div class="chan-av" style="background:${bg}">${ini(chan)}</div>
@@ -585,7 +665,6 @@
     document.getElementById('overlay').classList.add('open');
     document.body.style.overflow = 'hidden';
 
-    // Enrich async
     try {
       const d = await yt(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&id=${videoId}&key=${API_KEY}`);
       const item = d.items?.[0];
@@ -594,12 +673,13 @@
         document.getElementById('mTitle').textContent = item.snippet.title;
         document.getElementById('mDesc').textContent = item.snippet.description || 'No description.';
         document.getElementById('likeLabel').textContent = s.likeCount ? fmtN(s.likeCount) : 'Like';
-        document.getElementById('mStats').textContent = [fmtViews(s.viewCount),pubDate].filter(Boolean).join(' · ');
+        document.getElementById('mStats').textContent = [fmtViews(s.viewCount), pubDate].filter(Boolean).join(' · ');
         if (item.snippet.channelId) {
           const cd = await yt(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${item.snippet.channelId}&key=${API_KEY}`);
           const ch = cd.items?.[0];
           const el = document.getElementById('chanSubs');
-          if (el) el.textContent = ch?.statistics?.subscriberCount ? fmtN(ch.statistics.subscriberCount)+' subscribers' : '';
+          if (el) el.textContent = ch?.statistics?.subscriberCount
+            ? fmtN(ch.statistics.subscriberCount) + ' subscribers' : '';
         }
       }
     } catch(_) {}
@@ -611,17 +691,14 @@
     document.body.style.overflow = '';
     currentVideoId = '';
   }
-  function overlayClick(e) { if (e.target===document.getElementById('overlay')) closeModal(); }
-  document.addEventListener('keydown', e => { if (e.key==='Escape') { closeModal(); closeSettings(); } });
-
+  function overlayClick(e) { if (e.target === document.getElementById('overlay')) closeModal(); }
+  document.addEventListener('keydown', e => { if (e.key === 'Escape') { closeModal(); closeSettings(); } });
   function shareVideo() {
     const url = `https://youtu.be/${currentVideoId}`;
     if (navigator.share) navigator.share({url});
-    else navigator.clipboard.writeText(url).then(()=>alert('Link copied!\n'+url));
+    else navigator.clipboard.writeText(url).then(() => alert('Link copied!\n' + url));
   }
-  function openOnYT() {
-    window.open(`https://www.youtube.com/watch?v=${currentVideoId}`,'_blank');
-  }
+  function openOnYT() { window.open(`https://www.youtube.com/watch?v=${currentVideoId}`, '_blank'); }
 </script>
 </body>
 </html>
