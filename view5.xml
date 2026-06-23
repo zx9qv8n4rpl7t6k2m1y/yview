@@ -1,0 +1,1192 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<document>
+    <html><![CDATA[
+        <!DOCTYPE html>
+<html lang="en" data-theme="dark">
+<head>
+<meta charset="UTF-8"/><meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>ViewTube</title>
+<link href="https://fonts.googleapis.com/css2?family=Roboto:wght@300;400;500;700&display=swap" rel="stylesheet"/>
+<link href="https://fonts.googleapis.com/icon?family=Material+Icons" rel="stylesheet"/>
+<script src="https://accounts.google.com/gsi/client" async></script>
+<style>
+:root{
+  --bg:#0f0f0f;--bg2:#181818;--bg3:#212121;--bg4:#2a2a2a;
+  --hover:#3d3d3d;--txt:#fff;--txt2:#aaa;--txt3:#717171;
+  --red:#ff0000;--red2:#cc0000;--green:#2ecc71;--blue:#3284cc;
+  --border:#303030;--shadow:0 8px 32px rgba(0,0,0,.6);
+  --sidebar:240px;--header:56px;--r:12px;--r-lg:20px;
+}
+[data-theme=light]{
+  --bg:#f9f9f9;--bg2:#fff;--bg3:#f0f0f0;--bg4:#e5e5e5;
+  --hover:#e0e0e0;--txt:#0f0f0f;--txt2:#606060;--txt3:#909090;
+  --border:#e0e0e0;--shadow:0 4px 20px rgba(0,0,0,.1);
+}
+*,*::before,*::after{margin:0;padding:0;box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{font-family:'Roboto',sans-serif;background:var(--bg);color:var(--txt);min-height:100vh;transition:background .25s,color .25s;overflow-x:hidden}
+a{text-decoration:none;color:inherit}button{font-family:inherit;cursor:pointer}
+
+/* ══ SHIMMER SKELETON ══ */
+.sk{background:linear-gradient(90deg,var(--bg3) 25%,var(--bg4) 50%,var(--bg3) 75%);background-size:400% 100%;animation:shimmer 1.4s infinite;border-radius:var(--r)}
+.sk-tall{padding-bottom:177%}
+.sk-sq{padding-bottom:100%}
+.sk-short{height:14px;border-radius:4px}
+@keyframes shimmer{0%{background-position:100% 0}100%{background-position:-100% 0}}
+@keyframes spin{to{transform:rotate(360deg)}}
+@keyframes fadeIn{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:translateY(0)}}
+@keyframes slideUp{from{transform:translateY(100%)}to{transform:translateY(0)}}
+@keyframes spExitUp{from{transform:translateY(0);opacity:1}to{transform:translateY(-28%);opacity:0}}
+@keyframes spExitDown{from{transform:translateY(0);opacity:1}to{transform:translateY(28%);opacity:0}}
+@keyframes spEnterUp{from{transform:translateY(28%);opacity:0}to{transform:translateY(0);opacity:1}}
+@keyframes spEnterDown{from{transform:translateY(-28%);opacity:0}to{transform:translateY(0);opacity:1}}
+.anim-in{animation:fadeIn .25s ease both}
+
+/* ══ HEADER ══ */
+header{position:fixed;top:0;left:0;right:0;z-index:300;height:var(--header);background:var(--bg);border-bottom:1px solid var(--border);display:flex;align-items:center;padding:0 16px;gap:12px;transition:background .25s}
+.h-left{display:flex;align-items:center;gap:10px;min-width:190px}
+.icon-btn{background:none;border:none;color:var(--txt);width:40px;height:40px;border-radius:50%;display:flex;align-items:center;justify-content:center;transition:background .15s;flex-shrink:0;cursor:pointer}
+.icon-btn:hover{background:var(--hover)}
+.logo{display:flex;align-items:center;gap:6px;cursor:pointer}
+.logo-icon{width:34px;height:24px;background:var(--red);border-radius:6px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.logo-icon svg{width:14px;height:14px;fill:#fff}
+.logo-text{font-size:19px;font-weight:700;color:var(--txt);letter-spacing:-.5px;white-space:nowrap}
+.search-wrap{flex:1;max-width:640px;margin:0 auto;display:flex}
+.search-form{flex:1;display:flex;height:38px}
+.search-input{flex:1;background:var(--bg2);border:1px solid var(--border);border-right:none;border-radius:19px 0 0 19px;padding:0 18px;color:var(--txt);font-size:15px;outline:none;transition:border-color .2s,background .2s;font-family:inherit}
+.search-input:focus{border-color:var(--blue);background:var(--bg)}
+.search-input::placeholder{color:var(--txt3)}
+.search-btn{background:var(--bg2);border:1px solid var(--border);border-left:none;border-radius:0 19px 19px 0;padding:0 18px;color:var(--txt);display:flex;align-items:center;transition:background .15s;cursor:pointer}
+.search-btn:hover{background:var(--hover)}
+.h-right{margin-left:auto;display:flex;align-items:center;gap:6px}
+.sign-in-btn{display:flex;align-items:center;gap:8px;padding:7px 16px;border-radius:20px;background:transparent;border:1px solid var(--border);color:var(--blue);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;white-space:nowrap}
+.sign-in-btn:hover{background:rgba(50,132,204,.1)}
+.sign-in-btn .material-icons{font-size:20px}
+.user-menu{display:none;align-items:center;position:relative}
+.user-menu.show{display:flex}
+.user-av{width:32px;height:32px;border-radius:50%;object-fit:cover;cursor:pointer;border:2px solid transparent;transition:border-color .15s}
+.user-av:hover{border-color:var(--blue)}
+.user-dd{position:absolute;top:calc(100% + 10px);right:0;background:var(--bg2);border:1px solid var(--border);border-radius:var(--r);min-width:240px;box-shadow:var(--shadow);z-index:400;display:none;overflow:hidden;animation:fadeIn .15s ease}
+.user-dd.open{display:block}
+.dd-hdr{padding:16px;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px}
+.dd-av{width:40px;height:40px;border-radius:50%;object-fit:cover}
+.dd-name{font-size:14px;font-weight:500}.dd-email{font-size:12px;color:var(--txt3);margin-top:2px}
+.dd-item{display:flex;align-items:center;gap:14px;padding:12px 16px;font-size:14px;cursor:pointer;transition:background .15s;border:none;background:none;color:var(--txt);width:100%;text-align:left}
+.dd-item:hover{background:var(--hover)}
+.dd-item .material-icons{font-size:20px;color:var(--txt2)}
+.dd-div{height:1px;background:var(--border);margin:4px 0}
+
+/* ══ SIDEBAR ══ */
+.layout{display:flex;margin-top:var(--header)}
+aside{position:fixed;top:var(--header);left:0;bottom:0;width:var(--sidebar);background:var(--bg);overflow-y:auto;padding:8px 0;transition:transform .25s ease,background .25s;z-index:200;scrollbar-width:none;border-right:1px solid var(--border)}
+aside::-webkit-scrollbar{display:none}
+aside.hidden{transform:translateX(-100%)}
+.nav-sec{padding:6px 0;border-bottom:1px solid var(--border)}
+.nav-sec:last-child{border:none}
+.nav-sec-lbl{padding:8px 24px 4px;font-size:11px;font-weight:700;color:var(--txt3);letter-spacing:.06em;text-transform:uppercase}
+.nav-item{display:flex;align-items:center;gap:22px;padding:10px 20px;cursor:pointer;border-radius:10px;margin:0 6px;transition:background .15s;color:var(--txt);font-size:14px;background:none;border:none;width:calc(100% - 12px);text-align:left}
+.nav-item:hover{background:var(--hover)}
+.nav-item.active{background:var(--bg3);font-weight:500}
+.nav-item .material-icons{font-size:22px}
+.sub-list{padding:0 6px}
+.sub-item{display:flex;align-items:center;gap:12px;padding:8px 14px;border-radius:10px;cursor:pointer;transition:background .15s;font-size:13px;color:var(--txt2)}
+.sub-item:hover{background:var(--hover);color:var(--txt)}
+.sub-av{width:26px;height:26px;border-radius:50%;object-fit:cover;flex-shrink:0;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:11px;font-weight:700;color:#fff;overflow:hidden}
+.sub-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sub-nm{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+
+/* ══ MAIN ══ */
+main{margin-left:var(--sidebar);flex:1;min-height:calc(100vh - var(--header));transition:margin-left .25s ease;display:flex;flex-direction:column}
+main.full{margin-left:0}
+.chips{position:sticky;top:var(--header);z-index:150;background:var(--bg);padding:10px 20px;display:flex;gap:8px;overflow-x:auto;scrollbar-width:none;border-bottom:1px solid var(--border);transition:background .25s}
+.chips::-webkit-scrollbar{display:none}
+.chip{flex-shrink:0;padding:6px 14px;border-radius:8px;background:var(--bg3);color:var(--txt);font-size:14px;font-weight:500;cursor:pointer;border:none;transition:background .15s,color .15s,transform .1s;white-space:nowrap;font-family:inherit}
+.chip:hover{background:var(--hover);transform:translateY(-1px)}
+.chip.on{background:var(--txt);color:var(--bg)}
+.page-hdr{padding:16px 20px 0;border-bottom:1px solid var(--border);display:flex;align-items:center;gap:12px;flex-wrap:wrap;gap:10px}
+.page-hdr-title{font-size:20px;font-weight:600;color:var(--txt);padding-bottom:14px}
+.results-hdr{padding:12px 20px;font-size:14px;color:var(--txt2);border-bottom:1px solid var(--border)}
+/* shorts search bar */
+.shorts-search-wrap{flex:1;max-width:440px;padding-bottom:12px}
+.shorts-search-form{display:flex;height:36px}
+.shorts-s-inp{flex:1;background:var(--bg3);border:1px solid var(--border);border-right:none;border-radius:18px 0 0 18px;padding:0 16px;color:var(--txt);font-size:14px;outline:none;transition:border-color .2s;font-family:inherit}
+.shorts-s-inp:focus{border-color:var(--blue)}
+.shorts-s-inp::placeholder{color:var(--txt3)}
+.shorts-s-btn{background:var(--bg3);border:1px solid var(--border);border-left:none;border-radius:0 18px 18px 0;padding:0 14px;color:var(--txt);display:flex;align-items:center;cursor:pointer;transition:background .15s}
+.shorts-s-btn:hover{background:var(--hover)}
+
+/* ══ SHORTS SHELF ══ */
+.shorts-shelf{padding:16px 20px 8px;border-bottom:1px solid var(--border)}
+.shelf-hdr{display:flex;align-items:center;gap:10px;margin-bottom:14px}
+.shelf-hdr .material-icons{color:var(--red);font-size:26px}
+.shelf-hdr-ttl{font-size:17px;font-weight:600}
+.shelf-hdr a{margin-left:auto;font-size:13px;color:var(--blue);cursor:pointer;font-weight:500;transition:text-decoration .15s}
+.shelf-hdr a:hover{text-decoration:underline}
+.shorts-row{display:flex;gap:10px;overflow-x:auto;padding-bottom:6px;scrollbar-width:none}
+.shorts-row::-webkit-scrollbar{display:none}
+.s-shelf-card{flex-shrink:0;width:120px;cursor:pointer}
+.s-shelf-card:hover .s-shelf-img{transform:scale(1.05)}
+.s-shelf-wrap{width:120px;height:213px;border-radius:var(--r);overflow:hidden;background:var(--bg3);position:relative}
+.s-shelf-img{width:100%;height:100%;object-fit:cover;transition:transform .28s ease}
+.s-shelf-info{padding:6px 2px 2px}
+.s-shelf-ttl{font-size:13px;font-weight:500;line-height:1.3;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--txt)}
+.s-shelf-views{font-size:11px;color:var(--txt3);margin-top:2px}
+
+/* ══ VIDEO GRID ══ */
+.grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(290px,1fr));gap:16px;padding:20px;flex:1}
+.card{cursor:pointer;border-radius:var(--r);transition:transform .2s ease;will-change:transform}
+.card:hover{transform:translateY(-3px)}
+.card:hover .thumb-img{transform:scale(1.05)}
+.thumb-wrap{position:relative;width:100%;padding-bottom:56.25%;background:var(--bg3);border-radius:var(--r);overflow:hidden;box-shadow:0 2px 8px rgba(0,0,0,.3)}
+.thumb-img{position:absolute;inset:0;width:100%;height:100%;object-fit:cover;transition:transform .28s ease}
+.badge{position:absolute;bottom:6px;right:8px;background:rgba(0,0,0,.82);color:#fff;font-size:11px;font-weight:600;padding:2px 6px;border-radius:4px}
+.card-info{display:flex;gap:12px;padding:10px 4px 4px}
+.av{width:36px;height:36px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff;overflow:hidden;cursor:pointer;transition:transform .15s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.av:hover{transform:scale(1.1)}
+.av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.meta{flex:1;min-width:0}
+.vtitle{font-size:14px;font-weight:500;line-height:1.4;margin-bottom:4px;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;color:var(--txt)}
+.vchan{font-size:13px;color:var(--txt2);margin-bottom:3px;cursor:pointer}
+.vchan:hover{text-decoration:underline;color:var(--txt)}
+.vstats{font-size:13px;color:var(--txt3)}
+
+/* ══ CHANNEL GRID ══ */
+.chan-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(160px,1fr));gap:16px;padding:20px}
+.chan-card{display:flex;flex-direction:column;align-items:center;text-align:center;padding:20px 16px;border-radius:var(--r);background:var(--bg3);cursor:pointer;transition:background .15s,transform .2s}
+.chan-card:hover{background:var(--bg4);transform:translateY(-3px)}
+.chan-av-lg{width:72px;height:72px;border-radius:50%;margin-bottom:12px;object-fit:cover;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:28px;font-weight:700;color:#fff;overflow:hidden;box-shadow:0 2px 12px rgba(0,0,0,.3)}
+.chan-av-lg img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.chan-card-name{font-size:14px;font-weight:500;color:var(--txt);overflow:hidden;text-overflow:ellipsis;white-space:nowrap;width:100%;margin-bottom:4px}
+.chan-card-subs{font-size:12px;color:var(--txt3)}
+
+/* ══ INFINITE SCROLL ══ */
+#sentinel{height:1px}
+#botLoader{display:none;align-items:center;justify-content:center;gap:12px;padding:28px;color:var(--txt3);font-size:14px}
+#botLoader.show{display:flex}
+.spin-sm{width:26px;height:26px;border:3px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .7s linear infinite;flex-shrink:0}
+#endMsg{display:none;text-align:center;padding:24px;color:var(--txt3);font-size:13px;border-top:1px solid var(--border);margin:0 20px}
+#endMsg.show{display:block}
+
+/* ══ AUTH PROMPT ══ */
+.auth-box{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:60px 24px;text-align:center;grid-column:1/-1}
+.auth-box .material-icons{font-size:72px;color:var(--txt3);margin-bottom:20px}
+.auth-box h3{font-size:20px;font-weight:500;margin-bottom:8px}
+.auth-box p{font-size:14px;color:var(--txt2);margin-bottom:24px;max-width:320px;line-height:1.6}
+.auth-box-btn{display:flex;align-items:center;gap:8px;padding:12px 24px;background:var(--blue);color:#fff;border:none;border-radius:24px;font-size:15px;font-weight:600;cursor:pointer;font-family:inherit;transition:background .15s}
+.auth-box-btn:hover{background:#2266a8}
+
+/* ═══════════════════════════════════════
+   SHORTS PLAYER
+═══════════════════════════════════════ */
+.sp{display:none;position:fixed;inset:0;background:#000;z-index:800;flex-direction:column;align-items:center;justify-content:center}
+.sp.open{display:flex}
+.sp-topbar{position:absolute;top:0;left:0;right:0;z-index:10;display:flex;align-items:center;justify-content:space-between;padding:12px 16px;background:linear-gradient(to bottom,rgba(0,0,0,.75),transparent);pointer-events:none}
+.sp-topbar *{pointer-events:auto}
+.sp-logo{display:flex;align-items:center;gap:6px}
+.sp-logo-icon{width:28px;height:20px;background:var(--red);border-radius:5px;display:flex;align-items:center;justify-content:center}
+.sp-logo-icon svg{width:12px;height:12px;fill:#fff}
+.sp-logo-txt{font-size:15px;font-weight:700;color:#fff;letter-spacing:-.4px}
+.sp-logo-sub{font-size:10px;font-weight:700;color:rgba(255,255,255,.6);margin-left:2px}
+.sp-close{background:rgba(0,0,0,.45);border:none;color:#fff;width:38px;height:38px;border-radius:50%;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s;backdrop-filter:blur(4px)}
+.sp-close:hover{background:rgba(255,255,255,.2)}
+.sp-counter{font-size:13px;color:rgba(255,255,255,.7);font-weight:500}
+.sp-body{display:flex;align-items:center;justify-content:center;gap:0;width:100%;height:100%;position:relative}
+.sp-vwrap{position:relative;width:min(390px,calc(100vh * .5625));height:min(693px,100vh);max-height:100vh;background:#000;flex-shrink:0;overflow:hidden}
+.sp-iframe-box{position:absolute;inset:0}
+.sp-iframe-box iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.sp-exit-up{animation:spExitUp .22s ease forwards}
+.sp-exit-down{animation:spExitDown .22s ease forwards}
+.sp-enter-up{animation:spEnterUp .3s ease forwards}
+.sp-enter-down{animation:spEnterDown .3s ease forwards}
+.sp-grad-top{position:absolute;top:0;left:0;right:0;height:120px;background:linear-gradient(to bottom,rgba(0,0,0,.6),transparent);pointer-events:none;z-index:2}
+.sp-grad-bot{position:absolute;bottom:0;left:0;right:0;height:220px;background:linear-gradient(to top,rgba(0,0,0,.88),transparent);pointer-events:none;z-index:2}
+.sp-info{position:absolute;bottom:56px;left:0;right:72px;padding:0 14px;z-index:3}
+.sp-chan-row{display:flex;align-items:center;gap:10px;margin-bottom:10px}
+.sp-chan-av{width:40px;height:40px;border-radius:50%;object-fit:cover;border:2px solid rgba(255,255,255,.8);cursor:pointer;flex-shrink:0;background:var(--bg4);display:flex;align-items:center;justify-content:center;font-size:15px;font-weight:700;color:#fff;overflow:hidden;transition:transform .15s}
+.sp-chan-av:hover{transform:scale(1.08)}
+.sp-chan-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.sp-chan-nm{font-size:14px;font-weight:600;color:#fff;cursor:pointer;text-shadow:0 1px 4px rgba(0,0,0,.8)}
+.sp-chan-nm:hover{text-decoration:underline}
+.sp-sub{padding:5px 14px;border-radius:20px;background:#fff;color:#000;font-size:13px;font-weight:700;border:none;cursor:pointer;transition:background .15s;flex-shrink:0}
+.sp-sub:hover{background:#e0e0e0}
+.sp-sub.on{background:rgba(255,255,255,.15);color:#fff;border:1px solid rgba(255,255,255,.4)}
+.sp-title{font-size:14px;font-weight:500;color:#fff;line-height:1.4;display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden;text-shadow:0 1px 4px rgba(0,0,0,.9);margin-bottom:4px}
+.sp-acts{display:flex;flex-direction:column;align-items:center;gap:16px;padding:0 14px;z-index:5}
+@media(max-width:700px){.sp-acts{position:absolute;right:0;bottom:56px;padding:0 6px}}
+.sp-act{display:flex;flex-direction:column;align-items:center;gap:4px;cursor:pointer}
+.sp-act-btn{width:48px;height:48px;border-radius:50%;background:rgba(255,255,255,.12);border:none;color:#fff;display:flex;align-items:center;justify-content:center;transition:background .15s,transform .15s;cursor:pointer;backdrop-filter:blur(4px)}
+.sp-act-btn:hover{background:rgba(255,255,255,.24);transform:scale(1.08)}
+.sp-act-btn .material-icons{font-size:24px}
+.sp-act-btn.on{background:rgba(255,50,50,.35)}
+.sp-act-lbl{font-size:12px;color:rgba(255,255,255,.85);font-weight:500;text-align:center;text-shadow:0 1px 3px rgba(0,0,0,.7)}
+.sp-nav{position:absolute;right:12px;top:50%;transform:translateY(-50%);display:flex;flex-direction:column;gap:10px;z-index:5}
+@media(max-width:700px){.sp-nav{right:4px}}
+.sp-nav-btn{width:44px;height:44px;border-radius:50%;background:rgba(255,255,255,.14);border:none;color:#fff;display:flex;align-items:center;justify-content:center;cursor:pointer;transition:background .15s,transform .15s;backdrop-filter:blur(4px)}
+.sp-nav-btn:hover{background:rgba(255,255,255,.28);transform:scale(1.08)}
+.sp-nav-btn:disabled{opacity:.25;cursor:default;transform:none}
+.sp-loading{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;background:#000;z-index:1}
+.sp-progress{position:absolute;bottom:0;left:0;right:0;height:3px;background:rgba(255,255,255,.15);z-index:3}
+.sp-prog-bar{height:100%;background:var(--red);transition:width .4s ease}
+
+/* ═══════════════════════════════════════
+   COMMENTS PANEL (bottom sheet)
+═══════════════════════════════════════ */
+.cmts-bd{display:none;position:fixed;inset:0;background:rgba(0,0,0,.6);z-index:850;backdrop-filter:blur(2px)}
+.cmts-bd.open{display:block}
+.cmts-panel{
+  position:fixed;bottom:0;left:0;right:0;
+  height:72vh;background:var(--bg2);z-index:860;
+  border-radius:20px 20px 0 0;
+  transform:translateY(100%);transition:transform .35s cubic-bezier(.4,0,.2,1),background .25s;
+  display:flex;flex-direction:column;overflow:hidden;
+  box-shadow:0 -8px 40px rgba(0,0,0,.5);
+}
+.cmts-panel.open{transform:translateY(0)}
+@media(min-width:900px){
+  .cmts-panel{
+    top:var(--header);right:0;left:auto;bottom:0;
+    width:400px;height:auto;border-radius:0;
+    border-left:1px solid var(--border);
+    transform:translateX(100%);box-shadow:none;
+  }
+  .cmts-panel.open{transform:translateX(0)}
+  .cmts-drag{display:none}
+}
+.cmts-drag{width:36px;height:4px;background:var(--border);border-radius:2px;margin:10px auto 0;flex-shrink:0}
+.cmts-hdr{display:flex;align-items:center;padding:14px 16px;border-bottom:1px solid var(--border);flex-shrink:0;gap:10px}
+.cmts-title{font-size:16px;font-weight:600}
+.cmts-count{font-size:14px;color:var(--txt3);margin-right:auto}
+.cmts-sort{background:var(--bg3);border:1px solid var(--border);border-radius:8px;padding:6px 10px;color:var(--txt);font-size:13px;outline:none;cursor:pointer;font-family:inherit;transition:background .15s}
+.cmts-body{flex:1;overflow-y:auto;padding:4px 0 24px;scrollbar-width:thin;scrollbar-color:var(--border) transparent}
+.cmts-body::-webkit-scrollbar{width:4px}
+.cmts-body::-webkit-scrollbar-track{background:transparent}
+.cmts-body::-webkit-scrollbar-thumb{background:var(--border);border-radius:2px}
+/* comment item */
+.cmt{display:flex;gap:12px;padding:12px 16px;transition:background .15s;animation:fadeIn .2s ease both}
+.cmt:hover{background:var(--bg3)}
+.cmt-av{width:36px;height:36px;border-radius:50%;flex-shrink:0;overflow:hidden;background:var(--bg3);display:flex;align-items:center;justify-content:center;font-size:14px;font-weight:700;color:#fff}
+.cmt-av img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.cmt-body{flex:1;min-width:0}
+.cmt-meta{display:flex;align-items:center;gap:8px;margin-bottom:5px;flex-wrap:wrap}
+.cmt-author{font-size:13px;font-weight:500;color:var(--txt)}
+.cmt-time{font-size:12px;color:var(--txt3)}
+.cmt-text{font-size:14px;color:var(--txt2);line-height:1.55;word-break:break-word}
+.cmt-actions{display:flex;align-items:center;gap:14px;margin-top:8px}
+.cmt-like{display:flex;align-items:center;gap:5px;font-size:13px;color:var(--txt3);cursor:pointer;border:none;background:none;font-family:inherit;transition:color .15s;padding:0}
+.cmt-like:hover{color:var(--txt)}
+.cmt-like .material-icons{font-size:16px}
+.cmt-replies-btn{font-size:13px;color:var(--blue);cursor:pointer;border:none;background:none;font-family:inherit;font-weight:500;padding:0;transition:color .15s}
+.cmt-replies-btn:hover{text-decoration:underline}
+.cmt-replies{padding-left:48px;display:none}
+.cmt-replies.open{display:block}
+.cmts-load-more{width:calc(100% - 32px);margin:8px 16px;padding:12px;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);color:var(--txt);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;display:block}
+.cmts-load-more:hover{background:var(--hover)}
+.cmts-empty{display:flex;flex-direction:column;align-items:center;justify-content:center;padding:48px 24px;text-align:center;color:var(--txt2)}
+.cmts-empty .material-icons{font-size:52px;color:var(--txt3);margin-bottom:14px}
+.cmts-empty p{font-size:14px;line-height:1.6}
+
+/* ══ VIDEO MODAL ══ */
+.overlay{display:none;position:fixed;inset:0;background:rgba(0,0,0,.88);z-index:500;overflow-y:auto}
+.overlay.open{display:flex;align-items:flex-start;justify-content:center;padding:28px 16px}
+.modal{background:var(--bg2);border-radius:var(--r-lg);width:100%;max-width:920px;overflow:hidden;position:relative;animation:fadeIn .2s ease}
+.player-box{position:relative;padding-bottom:56.25%;background:#000}
+.player-box iframe{position:absolute;inset:0;width:100%;height:100%;border:none}
+.ply-load{position:absolute;inset:0;display:flex;align-items:center;justify-content:center;flex-direction:column;gap:14px;background:#000;color:#aaa;font-size:14px}
+.modal-close{position:absolute;top:12px;right:12px;background:rgba(0,0,0,.8);border:none;color:#fff;width:36px;height:36px;border-radius:50%;cursor:pointer;display:flex;align-items:center;justify-content:center;z-index:10;transition:background .15s}
+.modal-close:hover{background:rgba(0,0,0,.95)}
+.modal-body{padding:16px 20px 24px}
+.modal-title{font-size:18px;font-weight:600;line-height:1.35;margin-bottom:12px;color:var(--txt)}
+.modal-row{display:flex;align-items:center;justify-content:space-between;flex-wrap:wrap;gap:10px;padding-bottom:14px;border-bottom:1px solid var(--border)}
+.modal-stats{color:var(--txt2);font-size:14px}
+.act-row{display:flex;gap:8px;flex-wrap:wrap}
+.act-btn{display:flex;align-items:center;gap:6px;padding:8px 16px;border-radius:20px;background:var(--bg3);border:none;color:var(--txt);font-size:14px;font-weight:500;cursor:pointer;transition:background .15s,transform .1s;font-family:inherit}
+.act-btn:hover{background:var(--hover);transform:translateY(-1px)}
+.act-btn .material-icons{font-size:20px}
+.act-btn.on{background:rgba(255,50,50,.2);color:var(--red)}
+.modal-chan{display:flex;align-items:center;gap:14px;padding:14px 0;border-bottom:1px solid var(--border)}
+.chan-av-md{width:46px;height:46px;border-radius:50%;flex-shrink:0;display:flex;align-items:center;justify-content:center;font-size:19px;font-weight:700;overflow:hidden;cursor:pointer;transition:transform .15s;box-shadow:0 1px 6px rgba(0,0,0,.3)}
+.chan-av-md:hover{transform:scale(1.08)}
+.chan-av-md img{width:100%;height:100%;object-fit:cover;border-radius:50%}
+.chan-nm{font-size:15px;font-weight:500;color:var(--txt)}
+.chan-subs{font-size:13px;color:var(--txt2);margin-top:2px}
+.sub-btn{margin-left:auto;padding:10px 18px;border-radius:20px;background:var(--txt);color:var(--bg);border:none;font-size:14px;font-weight:600;cursor:pointer;transition:opacity .15s;font-family:inherit;white-space:nowrap}
+.sub-btn:hover{opacity:.85}
+.sub-btn.on{background:var(--bg3);color:var(--txt)}
+.desc{margin-top:14px;background:var(--bg3);border-radius:var(--r);padding:14px;font-size:14px;line-height:1.65;color:var(--txt2);white-space:pre-wrap;max-height:90px;overflow:hidden;cursor:pointer;position:relative;transition:max-height .3s,background .25s}
+.desc::after{content:'Show more';position:absolute;bottom:0;left:0;right:0;height:42px;background:linear-gradient(transparent,var(--bg3));display:flex;align-items:flex-end;justify-content:center;padding-bottom:6px;font-size:13px;font-weight:500;color:var(--txt);pointer-events:none;transition:opacity .3s}
+.desc.open{max-height:600px}
+.desc.open::after{opacity:0}
+.embed-blocked{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;background:#000;padding:30px;text-align:center}
+.embed-blocked .material-icons{font-size:52px;color:#555}
+.embed-blocked h3{font-size:17px;color:#fff;font-weight:500}
+.embed-blocked p{font-size:14px;color:#aaa;max-width:300px;line-height:1.5}
+.watch-yt{display:inline-flex;align-items:center;gap:8px;padding:12px 24px;background:var(--red);color:#fff;border-radius:24px;font-size:14px;font-weight:600;transition:background .15s;margin-top:4px}
+.watch-yt:hover{background:var(--red2)}
+
+/* ══ SETTINGS ══ */
+.s-bd{display:none;position:fixed;inset:0;background:rgba(0,0,0,.55);z-index:600;opacity:0;transition:opacity .25s}
+.s-bd.open{display:block;opacity:1}
+.s-panel{position:fixed;top:0;right:0;bottom:0;width:420px;background:var(--bg2);z-index:700;overflow-y:auto;transform:translateX(100%);transition:transform .3s ease,background .25s;border-left:1px solid var(--border);display:flex;flex-direction:column}
+.s-panel.open{transform:translateX(0)}
+.s-hdr{display:flex;align-items:center;justify-content:space-between;padding:18px 24px;border-bottom:1px solid var(--border);position:sticky;top:0;background:var(--bg2);z-index:1;transition:background .25s}
+.s-hdr h2{font-size:18px;font-weight:600}
+.s-body{padding:0 24px 40px;flex:1}
+.s-sec{margin-top:26px}
+.s-sec-ttl{font-size:11px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;color:var(--txt3);margin-bottom:8px}
+.s-card{background:var(--bg3);border-radius:var(--r);overflow:hidden}
+.s-row{display:flex;align-items:center;justify-content:space-between;padding:14px 16px;border-bottom:1px solid var(--border);gap:16px}
+.s-row:last-child{border:none}
+.s-lbl{font-size:14px;color:var(--txt)}
+.s-desc{font-size:12px;color:var(--txt3);margin-top:2px}
+.s-sel{background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:7px 10px;color:var(--txt);font-size:13px;outline:none;cursor:pointer;font-family:inherit;max-width:150px}
+.s-sel option{background:var(--bg2)}
+.s-tog{position:relative;width:46px;height:26px;flex-shrink:0}
+.s-tog input{display:none}
+.s-tog-track{position:absolute;inset:0;background:var(--bg4);border-radius:13px;cursor:pointer;transition:background .2s;border:1px solid var(--border)}
+.s-tog input:checked+.s-tog-track{background:var(--red);border-color:var(--red)}
+.s-tog-thumb{position:absolute;top:3px;left:3px;width:18px;height:18px;background:#fff;border-radius:50%;transition:transform .2s;pointer-events:none;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.s-tog input:checked~.s-tog-thumb{transform:translateX(20px)}
+.s-inp-row{display:flex;gap:8px;margin-top:10px}
+.s-inp{flex:1;background:var(--bg4);border:1px solid var(--border);border-radius:8px;padding:10px 12px;color:var(--txt);font-size:13px;outline:none;font-family:inherit;transition:border-color .2s}
+.s-inp:focus{border-color:var(--red)}
+.s-btn{padding:10px 16px;background:var(--red);color:#fff;border:none;border-radius:8px;font-size:13px;font-weight:600;cursor:pointer;transition:background .2s;font-family:inherit;white-space:nowrap}
+.s-btn:hover{background:var(--red2)}
+.s-btn.sec{background:var(--bg4);color:var(--txt);border:1px solid var(--border)}
+.s-btn.sec:hover{background:var(--hover)}
+.api-st{display:flex;align-items:center;gap:6px;font-size:12px;color:var(--txt2);margin-top:8px}
+.st-dot{width:8px;height:8px;border-radius:50%;flex-shrink:0}
+.st-dot.ok{background:var(--green)}.st-dot.err{background:var(--red)}.st-dot.idle{background:var(--txt3)}
+.s-act-btn{margin-top:10px;width:100%;padding:10px;background:var(--bg4);border:1px solid var(--border);border-radius:8px;color:var(--txt);font-size:13px;font-weight:500;cursor:pointer;transition:background .15s;font-family:inherit;display:flex;align-items:center;gap:8px;justify-content:center}
+.s-act-btn:hover{background:var(--hover)}
+.nw-tog{display:flex;align-items:center;gap:7px;background:none;border:none;color:var(--red);font-size:13px;font-weight:600;cursor:pointer;padding:10px 0;font-family:inherit;width:100%;text-align:left}
+.nw-tog .material-icons{font-size:18px;transition:transform .2s}
+.nw-tog.open .material-icons{transform:rotate(180deg)}
+.guide-wrap{display:none;margin-top:2px}
+.guide-wrap.open{display:block}
+.free-badge{display:inline-block;background:#1a4d2e;color:#4ade80;font-size:11px;font-weight:700;padding:2px 9px;border-radius:20px;margin-bottom:12px}
+.guide-steps{list-style:none;display:flex;flex-direction:column;gap:8px}
+.g-step{display:flex;gap:12px;align-items:flex-start;background:var(--bg4);border-radius:10px;padding:12px 14px}
+.g-num{width:22px;height:22px;border-radius:50%;background:var(--red);color:#fff;font-size:11px;font-weight:700;display:flex;align-items:center;justify-content:center;flex-shrink:0;margin-top:1px}
+.g-txt{font-size:12px;color:var(--txt2);line-height:1.55}
+.g-txt a{color:var(--blue)}.g-txt strong{color:var(--txt)}
+.guide-note{margin-top:8px;background:var(--bg4);border-left:3px solid var(--red);border-radius:0 8px 8px 0;padding:10px 12px;font-size:12px;color:var(--txt2);line-height:1.5}
+
+/* ══ TOAST ══ */
+.toast{position:fixed;bottom:24px;right:24px;z-index:1000;background:var(--bg3);border:1px solid var(--border);border-radius:var(--r);padding:14px 16px;display:flex;align-items:flex-start;gap:12px;max-width:360px;box-shadow:var(--shadow);transform:translateY(80px) scale(.95);opacity:0;transition:transform .3s cubic-bezier(.4,0,.2,1),opacity .3s ease;pointer-events:none}
+.toast.show{transform:translateY(0) scale(1);opacity:1;pointer-events:all}
+.toast .material-icons{font-size:22px;flex-shrink:0;margin-top:1px}
+.t-body{flex:1;min-width:0}
+.t-title{font-size:14px;font-weight:500;margin-bottom:3px}
+.t-msg{font-size:13px;color:var(--txt2);line-height:1.4}
+.t-acts{display:flex;gap:8px;margin-top:10px}
+.t-btn{padding:6px 14px;border-radius:8px;font-size:12px;font-weight:600;cursor:pointer;border:none;font-family:inherit;transition:background .15s}
+.t-btn.p{background:var(--red);color:#fff}.t-btn.p:hover{background:var(--red2)}
+.t-btn.s{background:var(--bg4);color:var(--txt)}.t-btn.s:hover{background:var(--hover)}
+.t-x{background:none;border:none;color:var(--txt3);cursor:pointer;flex-shrink:0;display:flex;align-items:center;transition:color .15s}
+.t-x:hover{color:var(--txt)}
+
+/* ══ FOOTER ══ */
+footer{background:var(--bg2);border-top:1px solid var(--border);padding:20px 24px;text-align:center;transition:background .25s}
+.ft-txt{font-size:12px;color:var(--txt3);line-height:1.7;max-width:680px;margin:0 auto}
+.ft-links{display:flex;align-items:center;justify-content:center;gap:16px;margin-top:10px;flex-wrap:wrap}
+.ft-links a{font-size:12px;color:var(--txt3);text-decoration:none;transition:color .15s}
+.ft-links a:hover{color:var(--txt)}
+.ft-div{color:var(--border)}
+
+/* ══ EMPTY / ERROR ══ */
+.empty{text-align:center;padding:70px 20px;grid-column:1/-1}
+.empty .material-icons{font-size:64px;color:var(--txt3);display:block;margin-bottom:14px}
+.empty h3{font-size:18px;font-weight:500;margin-bottom:6px;color:var(--txt)}
+.empty p{color:var(--txt2);font-size:14px}
+.spinner{width:46px;height:46px;border:4px solid var(--border);border-top-color:var(--red);border-radius:50%;animation:spin .8s linear infinite}
+.loader{display:flex;justify-content:center;padding:80px 0;grid-column:1/-1}
+
+@media(max-width:760px){
+  aside{transform:translateX(-100%)}
+  aside.mob-open{transform:translateX(0)}
+  main{margin-left:0!important}
+  .grid{grid-template-columns:1fr;padding:10px}
+  .logo-text{display:none}.h-left{min-width:auto}
+  .s-panel{width:100%;border-left:none}
+  .act-row .act-btn span:not(.material-icons){display:none}
+  .sp-vwrap{width:100vw;height:100vh}
+  .sp-acts{position:absolute;right:0;bottom:56px;padding:0 6px}
+  .sp-nav{right:4px}
+}
+</style>
+</head>
+<body>
+
+<!-- HEADER -->
+<header>
+  <div class="h-left">
+    <button class="icon-btn" onclick="toggleSidebar()"><span class="material-icons">menu</span></button>
+    <div class="logo" onclick="goHome()">
+      <div class="logo-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div>
+      <span class="logo-text">ViewTube</span>
+    </div>
+  </div>
+  <div class="search-wrap">
+    <form class="search-form" onsubmit="doSearch(event)">
+      <input id="searchBox" class="search-input" type="text" placeholder="Search videos…" autocomplete="off"/>
+      <button class="search-btn" type="submit"><span class="material-icons">search</span></button>
+    </form>
+  </div>
+  <div class="h-right">
+    <button class="sign-in-btn" id="signInBtn" onclick="signIn()"><span class="material-icons">account_circle</span>Sign in</button>
+    <div class="user-menu" id="userMenu">
+      <img class="user-av" id="userAv" src="" alt="" onclick="toggleDd()"/>
+      <div class="user-dd" id="userDd">
+        <div class="dd-hdr"><img class="dd-av" id="ddAv" src="" alt=""/><div><div class="dd-name" id="ddName"></div><div class="dd-email" id="ddEmail"></div></div></div>
+        <button class="dd-item" onclick="goView('liked');closeDd()"><span class="material-icons">thumb_up</span>Liked videos</button>
+        <button class="dd-item" onclick="goView('subscriptions');closeDd()"><span class="material-icons">subscriptions</span>Subscriptions</button>
+        <div class="dd-div"></div>
+        <button class="dd-item" onclick="openSettings();closeDd()"><span class="material-icons">settings</span>Settings</button>
+        <button class="dd-item" onclick="signOut()"><span class="material-icons">logout</span>Sign out</button>
+      </div>
+    </div>
+    <button class="icon-btn" onclick="openSettings()"><span class="material-icons">settings</span></button>
+  </div>
+</header>
+
+<!-- LAYOUT -->
+<div class="layout">
+  <aside id="sidebar">
+    <div class="nav-sec">
+      <button class="nav-item active" id="navHome" onclick="goHome();setActive(this)"><span class="material-icons">home</span><span>Home</span></button>
+      <button class="nav-item" id="navShorts" onclick="goView('shorts');setActive(this)"><span class="material-icons" style="color:var(--red)">play_circle</span><span>Shorts</span></button>
+    </div>
+    <div class="nav-sec" id="authNav" style="display:none">
+      <button class="nav-item" onclick="goView('subscriptions');setActive(this)"><span class="material-icons">subscriptions</span><span>Subscriptions</span></button>
+      <button class="nav-item" onclick="goView('liked');setActive(this)"><span class="material-icons">thumb_up</span><span>Liked Videos</span></button>
+      <div class="sub-list" id="sidebarSubs"></div>
+    </div>
+    <div class="nav-sec">
+      <button class="nav-item" onclick="runQuery('trending 2026');setActive(this)"><span class="material-icons">local_fire_department</span><span>Trending</span></button>
+      <button class="nav-item" onclick="runQuery('music 2026');setActive(this)"><span class="material-icons">music_note</span><span>Music</span></button>
+      <button class="nav-item" onclick="runQuery('gaming 2026');setActive(this)"><span class="material-icons">sports_esports</span><span>Gaming</span></button>
+      <button class="nav-item" onclick="runQuery('news today');setActive(this)"><span class="material-icons">article</span><span>News</span></button>
+      <button class="nav-item" onclick="runQuery('sports 2026');setActive(this)"><span class="material-icons">sports_soccer</span><span>Sports</span></button>
+      <button class="nav-item" onclick="runQuery('movie trailers 2026');setActive(this)"><span class="material-icons">movie</span><span>Movies</span></button>
+      <button class="nav-item" onclick="runQuery('programming tutorial');setActive(this)"><span class="material-icons">school</span><span>Learning</span></button>
+      <button class="nav-item" onclick="runQuery('cooking recipes');setActive(this)"><span class="material-icons">restaurant</span><span>Cooking</span></button>
+    </div>
+  </aside>
+
+  <main id="main">
+    <div class="chips" id="chipsBar">
+      <button class="chip on" onclick="goHome();chipOn(this)">All</button>
+      <button class="chip" onclick="runQuery('music');chipOn(this)">Music</button>
+      <button class="chip" onclick="runQuery('gaming');chipOn(this)">Gaming</button>
+      <button class="chip" onclick="runQuery('news');chipOn(this)">News</button>
+      <button class="chip" onclick="runQuery('comedy');chipOn(this)">Comedy</button>
+      <button class="chip" onclick="runQuery('tech');chipOn(this)">Tech</button>
+      <button class="chip" onclick="runQuery('cooking');chipOn(this)">Cooking</button>
+      <button class="chip" onclick="runQuery('sports');chipOn(this)">Sports</button>
+      <button class="chip" onclick="runQuery('travel');chipOn(this)">Travel</button>
+      <button class="chip" onclick="runQuery('fitness');chipOn(this)">Fitness</button>
+      <button class="chip" onclick="runQuery('science');chipOn(this)">Science</button>
+    </div>
+    <div class="shorts-shelf" id="shortsShelf" style="display:none">
+      <div class="shelf-hdr">
+        <span class="material-icons" style="color:var(--red)">play_circle</span>
+        <span class="shelf-hdr-ttl">Shorts</span>
+        <a onclick="goView('shorts');setActive(document.getElementById('navShorts'))">View all →</a>
+      </div>
+      <div class="shorts-row" id="shortsRow"></div>
+    </div>
+    <div class="page-hdr" id="pageHdr" style="display:none">
+      <span class="page-hdr-title" id="pageTitle"></span>
+      <form class="shorts-search-wrap" id="shortsSearchWrap" style="display:none" onsubmit="doShortsSearch(event)">
+        <div class="shorts-search-form">
+          <input id="shortsSearchBox" class="shorts-s-inp" type="text" placeholder="Search Shorts…" autocomplete="off"/>
+          <button class="shorts-s-btn" type="submit"><span class="material-icons" style="font-size:18px">search</span></button>
+        </div>
+      </form>
+    </div>
+    <div class="results-hdr" id="resultsHdr" style="display:none"></div>
+    <div class="grid" id="grid"></div>
+    <div class="chan-grid" id="chanGrid" style="display:none"></div>
+    <div id="sentinel"></div>
+    <div id="botLoader"><div class="spin-sm"></div>Loading more…</div>
+    <div id="endMsg">— You've seen it all —</div>
+    <footer>
+      <p class="ft-txt">Videos are provided by YouTube. ViewTube does not host or store any video content. All rights belong to their respective creators.</p>
+      <div class="ft-links">
+        <a href="https://www.youtube.com" target="_blank">YouTube</a><span class="ft-div">·</span>
+        <a href="https://policies.google.com/privacy" target="_blank">Privacy</a><span class="ft-div">·</span>
+        <a href="https://www.youtube.com/t/terms" target="_blank">Terms</a><span class="ft-div">·</span>
+        <span style="color:var(--txt3)">© 2026 ViewTube</span>
+      </div>
+    </footer>
+  </main>
+</div>
+
+<!-- SHORTS PLAYER -->
+<div class="sp" id="sp">
+  <div class="sp-topbar">
+    <div class="sp-logo"><div class="sp-logo-icon"><svg viewBox="0 0 24 24"><path d="M8 5v14l11-7z"/></svg></div><span class="sp-logo-txt">ViewTube</span><span class="sp-logo-sub">Shorts</span></div>
+    <span class="sp-counter" id="spCounter"></span>
+    <button class="sp-close" onclick="closeSP()"><span class="material-icons">close</span></button>
+  </div>
+  <div class="sp-body">
+    <div class="sp-vwrap" id="spVwrap">
+      <div class="sp-loading" id="spLoad"><div class="spinner" style="width:38px;height:38px;border-width:3px"></div></div>
+      <div class="sp-iframe-box" id="spBox"></div>
+      <div class="sp-grad-top"></div><div class="sp-grad-bot"></div>
+      <div class="sp-info">
+        <div class="sp-chan-row">
+          <div class="sp-chan-av" id="spAv" onclick="spGoChannel()"></div>
+          <span class="sp-chan-nm" id="spChan" onclick="spGoChannel()"></span>
+          <button class="sp-sub" id="spSub" onclick="spSubscribe()">Subscribe</button>
+        </div>
+        <div class="sp-title" id="spTitle"></div>
+      </div>
+      <div class="sp-progress"><div class="sp-prog-bar" id="spProg" style="width:0%"></div></div>
+    </div>
+    <div class="sp-acts">
+      <div class="sp-act"><button class="sp-act-btn" id="spLikeBtn" onclick="spLike()"><span class="material-icons">thumb_up</span></button><span class="sp-act-lbl" id="spLikes">Like</span></div>
+      <div class="sp-act"><button class="sp-act-btn" onclick="spDislike(this)"><span class="material-icons">thumb_down</span></button><span class="sp-act-lbl">Dislike</span></div>
+      <div class="sp-act"><button class="sp-act-btn" onclick="openComments(spVid, spVidComments, true)"><span class="material-icons">chat_bubble_outline</span></button><span class="sp-act-lbl" id="spComments">Comments</span></div>
+      <div class="sp-act"><button class="sp-act-btn" onclick="spShare()"><span class="material-icons" style="transform:scaleX(-1)">reply</span></button><span class="sp-act-lbl">Share</span></div>
+      <div class="sp-act"><button class="sp-act-btn" onclick="spYT()"><span class="material-icons">open_in_new</span></button><span class="sp-act-lbl">YouTube</span></div>
+    </div>
+  </div>
+  <div class="sp-nav">
+    <button class="sp-nav-btn" id="spPrev" onclick="spNav(-1)"><span class="material-icons">keyboard_arrow_up</span></button>
+    <button class="sp-nav-btn" id="spNext" onclick="spNav(1)"><span class="material-icons">keyboard_arrow_down</span></button>
+  </div>
+</div>
+
+<!-- COMMENTS PANEL -->
+<div class="cmts-bd" id="cmtsBd" onclick="closeComments()"></div>
+<div class="cmts-panel" id="cmtsPanel">
+  <div class="cmts-drag"></div>
+  <div class="cmts-hdr">
+    <span class="cmts-title">Comments</span>
+    <span class="cmts-count" id="cmtsCount"></span>
+    <select class="cmts-sort" id="cmtsSort" onchange="reloadComments()">
+      <option value="relevance">Top comments</option>
+      <option value="time">Newest first</option>
+    </select>
+    <button class="icon-btn" onclick="closeComments()"><span class="material-icons">close</span></button>
+  </div>
+  <div class="cmts-body" id="cmtsBody"></div>
+</div>
+
+<!-- VIDEO MODAL -->
+<div class="overlay" id="overlay" onclick="overlayClick(event)">
+  <div class="modal" id="modal">
+    <div class="player-box" id="playerBox"><div class="ply-load"><div class="spinner" style="width:40px;height:40px"></div><span>Loading…</span></div></div>
+    <button class="modal-close" onclick="closeModal()"><span class="material-icons">close</span></button>
+    <div class="modal-body">
+      <div class="modal-title" id="mTitle"></div>
+      <div class="modal-row">
+        <div class="modal-stats" id="mStats"></div>
+        <div class="act-row">
+          <button class="act-btn" id="likeBtn" onclick="toggleLike()"><span class="material-icons">thumb_up</span><span id="likeLabel">Like</span></button>
+          <button class="act-btn"><span class="material-icons">thumb_down</span></button>
+          <button class="act-btn" id="cmtBtn" onclick="openComments(curVid, curVidComments, false)"><span class="material-icons">chat_bubble_outline</span><span>Comments</span></button>
+          <button class="act-btn" onclick="shareVideo()"><span class="material-icons">share</span><span>Share</span></button>
+          <button class="act-btn" onclick="openOnYT()"><span class="material-icons">open_in_new</span><span>YouTube</span></button>
+        </div>
+      </div>
+      <div class="modal-chan" id="mChan"></div>
+      <div class="desc" id="mDesc" onclick="this.classList.toggle('open')"></div>
+    </div>
+  </div>
+</div>
+
+<!-- SETTINGS -->
+<div class="s-bd" id="sBd" onclick="closeSettings()"></div>
+<div class="s-panel" id="sPanel">
+  <div class="s-hdr"><h2>Settings</h2><button class="icon-btn" onclick="closeSettings()"><span class="material-icons">close</span></button></div>
+  <div class="s-body">
+    <div class="s-sec"><div class="s-sec-ttl">Account</div>
+      <div class="s-card"><div class="s-row"><div><div class="s-lbl" id="sAccName">Not signed in</div><div class="s-desc" id="sAccEmail">Sign in to access subscriptions &amp; liked videos</div></div><button class="s-btn" id="sSignBtn" onclick="sSignIn()">Sign in</button></div></div>
+    </div>
+    <div class="s-sec"><div class="s-sec-ttl">YouTube API Key</div>
+      <div class="s-card" style="padding:14px 16px">
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:10px">Required for all video loading. Stored only in your browser.</div>
+        <div class="s-inp-row"><input id="keyInp" class="s-inp" type="text" placeholder="AIzaSy…" autocomplete="off"/><button class="s-btn" onclick="saveKey()">Save</button></div>
+        <div class="api-st"><div class="st-dot idle" id="stDot"></div><span id="stTxt">Not tested</span></div>
+        <button class="s-act-btn" onclick="testKey()"><span class="material-icons" style="font-size:16px">wifi</span>Test API Key</button>
+        <button class="nw-tog" id="nwT1" onclick="toggleG('g1','nwT1')"><span class="material-icons">expand_more</span>Not Working? Free API Setup Guide</button>
+        <div class="guide-wrap" id="g1"><span class="free-badge">✓ 100% FREE · 10,000 requests/day</span>
+          <ol class="guide-steps">
+            <li class="g-step"><div class="g-num">1</div><div class="g-txt"><strong>Go to Google Cloud Console</strong><br>Visit <a href="https://console.cloud.google.com" target="_blank">console.cloud.google.com</a> — free Google account required.</div></li>
+            <li class="g-step"><div class="g-num">2</div><div class="g-txt"><strong>Create a project</strong><br>Project dropdown → New Project → name it → Create.</div></li>
+            <li class="g-step"><div class="g-num">3</div><div class="g-txt"><strong>Enable YouTube Data API v3</strong><br>APIs &amp; Services → Library → search "YouTube Data API v3" → Enable.</div></li>
+            <li class="g-step"><div class="g-num">4</div><div class="g-txt"><strong>Create API Key</strong><br>APIs &amp; Services → Credentials → Create Credentials → API Key → copy it.</div></li>
+            <li class="g-step"><div class="g-num">5</div><div class="g-txt"><strong>Paste &amp; Save above, then Test.</strong></div></li>
+          </ol>
+          <div class="guide-note"><strong>Free quota:</strong> 10,000 units/day. Each search ~100 units. Perfect for personal use.</div>
+        </div>
+      </div>
+    </div>
+    <div class="s-sec"><div class="s-sec-ttl">Google Sign-In (OAuth)</div>
+      <div class="s-card" style="padding:14px 16px">
+        <div style="font-size:13px;color:var(--txt2);margin-bottom:10px">Needed for subscriptions &amp; liked videos. <strong style="color:var(--txt)">Free.</strong></div>
+        <div class="s-inp-row"><input id="cidInp" class="s-inp" type="text" placeholder="xxxxxx.apps.googleusercontent.com"/><button class="s-btn" onclick="saveCid()">Save</button></div>
+        <button class="nw-tog" id="nwT2" onclick="toggleG('g2','nwT2')"><span class="material-icons">expand_more</span>How to get a free OAuth Client ID</button>
+        <div class="guide-wrap" id="g2"><span class="free-badge">✓ FREE</span>
+          <ol class="guide-steps">
+            <li class="g-step"><div class="g-num">1</div><div class="g-txt"><strong>In your Google Cloud project</strong><br>APIs &amp; Services → Credentials.</div></li>
+            <li class="g-step"><div class="g-num">2</div><div class="g-txt"><strong>Create OAuth 2.0 Client ID</strong><br>Create Credentials → OAuth client ID → Web application.</div></li>
+            <li class="g-step"><div class="g-num">3</div><div class="g-txt"><strong>Add Authorized JavaScript Origins</strong><br>Add the URL where ViewTube is hosted.</div></li>
+            <li class="g-step"><div class="g-num">4</div><div class="g-txt"><strong>Copy &amp; paste the Client ID above.</strong></div></li>
+          </ol>
+        </div>
+      </div>
+    </div>
+    <div class="s-sec"><div class="s-sec-ttl">Appearance</div>
+      <div class="s-card">
+        <div class="s-row"><div><div class="s-lbl">Theme</div></div><select class="s-sel" id="themeSel" onchange="setTheme(this.value)"><option value="dark">Dark</option><option value="light">Light</option><option value="auto">Auto</option></select></div>
+      </div>
+    </div>
+    <div class="s-sec"><div class="s-sec-ttl">Content</div>
+      <div class="s-card">
+        <div class="s-row"><div><div class="s-lbl">Region</div><div class="s-desc">Trending videos region</div></div><select class="s-sel" id="regionSel" onchange="setSetting('region',this.value)"><option value="US">🇺🇸 US</option><option value="CA">🇨🇦 Canada</option><option value="GB">🇬🇧 UK</option><option value="AU">🇦🇺 Australia</option><option value="FR">🇫🇷 France</option><option value="DE">🇩🇪 Germany</option><option value="JP">🇯🇵 Japan</option><option value="IN">🇮🇳 India</option><option value="BR">🇧🇷 Brazil</option><option value="KR">🇰🇷 Korea</option></select></div>
+        <div class="s-row"><div><div class="s-lbl">Videos per page</div></div><select class="s-sel" id="ppSel" onchange="setSetting('perPage',this.value)"><option value="12">12</option><option value="24" selected>24</option><option value="48">48</option></select></div>
+        <div class="s-row"><div><div class="s-lbl">Safe Search</div></div><select class="s-sel" id="safeSel" onchange="setSetting('safeSearch',this.value)"><option value="none">Off</option><option value="moderate" selected>Moderate</option><option value="strict">Strict</option></select></div>
+        <div class="s-row"><div><div class="s-lbl">Autoplay</div><div class="s-desc">Auto-start when opened</div></div><label class="s-tog"><input type="checkbox" id="autoTog" onchange="setSetting('autoplay',this.checked?'true':'false')" checked/><div class="s-tog-track"></div><div class="s-tog-thumb"></div></label></div>
+        <div class="s-row"><div><div class="s-lbl">Shorts on Home</div></div><label class="s-tog"><input type="checkbox" id="shHomeTog" onchange="setSetting('shortsHome',this.checked?'true':'false')" checked/><div class="s-tog-track"></div><div class="s-tog-thumb"></div></label></div>
+      </div>
+    </div>
+    <div class="s-sec"><div class="s-sec-ttl">About</div>
+      <div class="s-card">
+        <div class="s-row"><div><div class="s-lbl">ViewTube</div><div class="s-desc">Version 3.0 · YouTube Data API v3</div></div></div>
+        <div class="s-row"><div><div class="s-lbl">Reset settings</div></div><button class="s-btn sec" onclick="clearAll()">Reset</button></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- TOAST -->
+<div class="toast" id="toast">
+  <span class="material-icons" id="tIcon">error_outline</span>
+  <div class="t-body"><div class="t-title" id="tTitle"></div><div class="t-msg" id="tMsg"></div><div class="t-acts" id="tActs"></div></div>
+  <button class="t-x" onclick="hideToast()"><span class="material-icons" style="font-size:18px">close</span></button>
+</div>
+
+<script>
+// ══ CONFIG ══
+const DEFAULT_KEY='AIzaSyBDPtgwn3q9T0nrnOLrppxMd1Gu-WONdh0';
+let API_KEY=ls('vt_key')||DEFAULT_KEY,CLIENT_ID=ls('vt_cid')||'';
+let S={theme:ls('vt_theme')||'dark',region:ls('vt_region')||'US',perPage:ls('vt_perPage')||'24',safeSearch:ls('vt_safe')||'moderate',autoplay:ls('vt_auto')||'true',shortsHome:ls('vt_shortsH')||'true'};
+let ACCESS_TOKEN=null,USER_INFO=null,tokenClient=null;
+let nextPage='',loading=false,hasMore=false;
+let curMode='home',curQuery='',curChanId='';
+let curVid='',curVidComments=0,sidebarOpen=true,toastTimer=null;
+// shorts
+let spVids=[],spIdx=0,spGoing=false,spVid='',spVidComments=0,spChanId='';
+// channel cache
+const chanCache=new Map();
+// comments
+let cmtsVid='',cmtsNext='',cmtsLoading=false,cmtsForShorts=false;
+
+function ls(k){try{return localStorage.getItem(k);}catch(e){return null;}}
+function lsSet(k,v){try{localStorage.setItem(k,v);}catch(e){}}
+function shuffle(a){const b=[...a];for(let i=b.length-1;i>0;i--){const j=Math.floor(Math.random()*(i+1));[b[i],b[j]]=[b[j],b[i]];}return b;}
+
+// ══ BOOT ══
+window.addEventListener('DOMContentLoaded',()=>{
+  applyTheme(S.theme);syncUI();
+  new IntersectionObserver(e=>{if(e[0].isIntersecting&&hasMore&&!loading)loadMore();},{rootMargin:'400px'}).observe(document.getElementById('sentinel'));
+  document.addEventListener('click',e=>{if(!document.getElementById('userDd').contains(e.target)&&!document.getElementById('userAv').contains(e.target))closeDd();});
+  goHome();
+});
+window.addEventListener('load',()=>setTimeout(()=>{if(CLIENT_ID)initOAuth();},1000));
+
+// ══ THEME ══
+function applyTheme(t){const d=t==='auto'?window.matchMedia('(prefers-color-scheme:dark)').matches:t==='dark';document.documentElement.setAttribute('data-theme',d?'dark':'light');}
+function setTheme(v){S.theme=v;lsSet('vt_theme',v);applyTheme(v);}
+window.matchMedia('(prefers-color-scheme:dark)').addEventListener('change',()=>{if(S.theme==='auto')applyTheme('auto');});
+
+// ══ SETTINGS ══
+function setSetting(k,v){S[k]=v;lsSet('vt_'+k,v);}
+function syncUI(){
+  document.getElementById('keyInp').value=API_KEY;
+  document.getElementById('cidInp').value=CLIENT_ID;
+  document.getElementById('themeSel').value=S.theme;
+  document.getElementById('regionSel').value=S.region;
+  document.getElementById('ppSel').value=S.perPage;
+  document.getElementById('safeSel').value=S.safeSearch;
+  document.getElementById('autoTog').checked=S.autoplay==='true';
+  document.getElementById('shHomeTog').checked=S.shortsHome==='true';
+}
+function saveKey(){const v=document.getElementById('keyInp').value.trim();if(!v)return;API_KEY=v;lsSet('vt_key',v);testKey();}
+function saveCid(){const v=document.getElementById('cidInp').value.trim();if(!v)return;CLIENT_ID=v;lsSet('vt_cid',v);showToast('Saved','Reload the page to apply sign-in.','info',false);}
+async function testKey(){
+  const d=document.getElementById('stDot'),t=document.getElementById('stTxt');
+  d.className='st-dot idle';t.textContent='Testing…';
+  try{const r=await yt(`https://www.googleapis.com/youtube/v3/videos?part=snippet&chart=mostPopular&maxResults=1&regionCode=US&key=${API_KEY}`);if(r.items?.length){d.className='st-dot ok';t.textContent='API key working ✓';}else{d.className='st-dot err';t.textContent='No results — check key';}}
+  catch(e){d.className='st-dot err';t.textContent=e.message.substring(0,60);}
+}
+function toggleG(gId,bId){const g=document.getElementById(gId),b=document.getElementById(bId);const o=g.classList.toggle('open');b.classList.toggle('open',o);}
+function clearAll(){if(!confirm('Reset all settings?'))return;localStorage.clear();API_KEY=DEFAULT_KEY;CLIENT_ID='';S={theme:'dark',region:'US',perPage:'24',safeSearch:'moderate',autoplay:'true',shortsHome:'true'};syncUI();applyTheme('dark');showToast('Reset','All settings cleared.','info',false);}
+function openSettings(){syncUI();document.getElementById('sPanel').classList.add('open');document.getElementById('sBd').classList.add('open');document.body.style.overflow='hidden';}
+function closeSettings(){document.getElementById('sPanel').classList.remove('open');document.getElementById('sBd').classList.remove('open');document.body.style.overflow='';}
+
+// ══ OAUTH ══
+function initOAuth(){if(!CLIENT_ID||!window.google?.accounts?.oauth2)return false;tokenClient=google.accounts.oauth2.initTokenClient({client_id:CLIENT_ID,scope:'https://www.googleapis.com/auth/youtube.readonly https://www.googleapis.com/auth/userinfo.profile https://www.googleapis.com/auth/userinfo.email',callback:async r=>{if(r.error){showToast('Sign-in failed',r.error,'error',false);return;}ACCESS_TOKEN=r.access_token;await fetchUI();updateAuth(true);showToast('Signed in',`Welcome, ${USER_INFO?.name||''}!`,'success',false);}});return true;}
+function signIn(){if(!CLIENT_ID){showToast('OAuth Client ID needed','Add your Client ID in Settings.','error',true);return;}if(!tokenClient&&!initOAuth()){showToast('Loading…','Try again in a moment.','info',false);return;}tokenClient.requestAccessToken({prompt:'select_account'});}
+function sSignIn(){closeSettings();signIn();}
+function signOut(){if(ACCESS_TOKEN&&window.google?.accounts?.oauth2)google.accounts.oauth2.revoke(ACCESS_TOKEN);ACCESS_TOKEN=null;USER_INFO=null;updateAuth(false);document.getElementById('sidebarSubs').innerHTML='';document.getElementById('authNav').style.display='none';closeDd();showToast('Signed out','','info',false);goHome();}
+async function fetchUI(){try{const r=await fetch(`https://www.googleapis.com/oauth2/v2/userinfo?access_token=${ACCESS_TOKEN}`);USER_INFO=await r.json();}catch(_){}}
+function updateAuth(si){
+  document.getElementById('signInBtn').style.display=si?'none':'flex';
+  document.getElementById('userMenu').classList.toggle('show',si);
+  if(si&&USER_INFO){const av=USER_INFO.picture||'';['userAv','ddAv'].forEach(id=>document.getElementById(id).src=av);document.getElementById('ddName').textContent=USER_INFO.name||'';document.getElementById('ddEmail').textContent=USER_INFO.email||'';document.getElementById('sAccName').textContent=USER_INFO.name||'';document.getElementById('sAccEmail').textContent=USER_INFO.email||'';document.getElementById('sSignBtn').textContent='Sign out';document.getElementById('sSignBtn').onclick=signOut;document.getElementById('authNav').style.display='block';loadSideSubs();}
+  else{document.getElementById('sAccName').textContent='Not signed in';document.getElementById('sAccEmail').textContent='Sign in to access subscriptions & liked videos';document.getElementById('sSignBtn').textContent='Sign in';document.getElementById('sSignBtn').onclick=sSignIn;}
+}
+function toggleDd(){document.getElementById('userDd').classList.toggle('open');}
+function closeDd(){document.getElementById('userDd').classList.remove('open');}
+
+// ══ FETCH ══
+async function yt(url){let r;try{r=await fetch(url);}catch(e){throw new Error('Network error — check your connection.');}const d=await r.json();if(d.error)throw new Error(`API ${d.error.code}: ${d.error.message}`);return d;}
+async function ytAuth(url){if(!ACCESS_TOKEN)throw new Error('Not signed in');let r;try{r=await fetch(url,{headers:{Authorization:`Bearer ${ACCESS_TOKEN}`}});}catch(e){throw new Error('Network error');}const d=await r.json();if(d.error)throw new Error(`API ${d.error.code}: ${d.error.message}`);return d;}
+
+// ══ FORMAT ══
+function fN(n){n=parseInt(n,10);if(isNaN(n))return'';if(n>=1e9)return(n/1e9).toFixed(1)+'B';if(n>=1e6)return(n/1e6).toFixed(1)+'M';if(n>=1e3)return Math.round(n/1e3)+'K';return''+n;}
+function fV(n){const s=fN(n);return s?s+' views':'';}
+function ago(d){const s=Math.floor((Date.now()-new Date(d))/1000);if(s<60)return s+'s ago';const m=Math.floor(s/60);if(m<60)return m+'m ago';const h=Math.floor(m/60);if(h<24)return h+'h ago';const dy=Math.floor(h/24);if(dy<30)return dy+'d ago';const mo=Math.floor(dy/30);if(mo<12)return mo+' mo ago';return Math.floor(mo/12)+' yr ago';}
+function ini(s){return(s||'?').charAt(0).toUpperCase();}
+const CLR=['#e53935','#8e24aa','#1e88e5','#00897b','#f4511e','#6d4c41','#546e7a','#fb8c00','#00acc1','#43a047'];
+function aC(s){let h=0;for(let i=0;i<s.length;i++)h=s.charCodeAt(i)+((h<<5)-h);return CLR[Math.abs(h)%CLR.length];}
+
+// ══ CHANNEL AVATARS ══
+async function fetchAvatars(vids){
+  const ids=[...new Set(vids.map(v=>v.snippet?.channelId).filter(Boolean))];
+  const unc=ids.filter(id=>!chanCache.has(id));
+  if(!unc.length)return updateAvEls(ids);
+  try{
+    for(let i=0;i<unc.length;i+=50){
+      const b=unc.slice(i,i+50);
+      const d=await yt(`https://www.googleapis.com/youtube/v3/channels?part=snippet&id=${b.join(',')}&key=${API_KEY}`);
+      (d.items||[]).forEach(ch=>chanCache.set(ch.id,{thumb:ch.snippet.thumbnails?.medium?.url||ch.snippet.thumbnails?.default?.url||'',name:ch.snippet.title||''}));
+    }
+    updateAvEls(ids);
+  }catch(_){}
+}
+function updateAvEls(ids){ids.forEach(id=>{const c=chanCache.get(id);if(!c?.thumb)return;document.querySelectorAll(`.av[data-cid="${id}"],.chan-av-md[data-cid="${id}"]`).forEach(el=>{el.innerHTML=`<img src="${c.thumb}" alt="" onerror="this.style.display='none'">`;el.style.background='transparent';});});}
+
+// ══ NAV ══
+function toggleSidebar(){sidebarOpen=!sidebarOpen;const sb=document.getElementById('sidebar'),mn=document.getElementById('main');if(window.innerWidth<=760){sb.classList.toggle('mob-open',sidebarOpen);}else{sb.classList.toggle('hidden',!sidebarOpen);mn.classList.toggle('full',!sidebarOpen);}}
+function setActive(el){document.querySelectorAll('.nav-item').forEach(n=>n.classList.remove('active'));el.classList.add('active');}
+function chipOn(el){document.querySelectorAll('.chip').forEach(c=>c.classList.remove('on'));el.classList.add('on');}
+
+// ══ UI HELPERS ══
+function showView(v){document.getElementById('grid').style.display=v==='grid'?'':'none';document.getElementById('chanGrid').style.display=v==='chans'?'':'none';}
+function clearPage(){document.getElementById('grid').innerHTML='';document.getElementById('chanGrid').innerHTML='';document.getElementById('shortsShelf').style.display='none';document.getElementById('chipsBar').style.display='none';document.getElementById('pageHdr').style.display='none';document.getElementById('shortsSearchWrap').style.display='none';document.getElementById('resultsHdr').style.display='none';document.getElementById('endMsg').classList.remove('show');document.getElementById('botLoader').classList.remove('show');nextPage='';hasMore=false;}
+function setScroll(tok){nextPage=tok||'';hasMore=!!nextPage;document.getElementById('botLoader').classList.remove('show');document.getElementById('endMsg').classList.toggle('show',!hasMore&&document.querySelectorAll('.card').length>0);}
+function showBL(){document.getElementById('botLoader').classList.add('show');document.getElementById('endMsg').classList.remove('show');}
+function hideBL(){document.getElementById('botLoader').classList.remove('show');}
+function mkEmpty(msg,icon='search_off'){return`<div class="empty"><span class="material-icons">${icon}</span><h3>${msg}</h3></div>`;}
+function mkAuthBox(msg){return`<div class="auth-box"><span class="material-icons">lock</span><h3>Sign in required</h3><p>${msg}</p><button class="auth-box-btn" onclick="signIn()"><span class="material-icons">account_circle</span>Sign in with Google</button></div>`;}
+
+// ══ SIDEBAR SUBS ══
+async function loadSideSubs(){if(!ACCESS_TOKEN)return;try{const d=await ytAuth('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=12&order=alphabetical');const list=document.getElementById('sidebarSubs');list.innerHTML='<div class="nav-sec-lbl" style="padding-left:14px">Your channels</div>';(d.items||[]).slice(0,8).forEach(s=>{const sn=s.snippet||{},cid=sn.resourceId?.channelId||'',nm=sn.title||'Channel',bg=aC(nm),th=sn.thumbnails?.default?.url||'';const el=document.createElement('div');el.className='sub-item';el.innerHTML=`<div class="sub-av">${th?`<img src="${th}" alt=""/>`:`<span style="font-size:11px;font-weight:700;color:#fff">${ini(nm)}</span>`}</div><span class="sub-nm">${nm}</span>`;el.addEventListener('click',()=>loadChanView(cid,nm));list.appendChild(el);});}catch(_){}}
+
+// ══ CARD RENDERING ══
+function mkCard(v,idx,isShort=false){
+  const sn=v.snippet||{},st=v.statistics||{};
+  const id=typeof v.id==='string'?v.id:(v.id?.videoId||'');
+  if(!id)return null;
+  const th=isShort?(sn.thumbnails?.high?.url||sn.thumbnails?.medium?.url||''):(sn.thumbnails?.medium?.url||sn.thumbnails?.default?.url||'');
+  const title=sn.title||'(no title)',chan=sn.channelTitle||'',pub=sn.publishedAt||'',bg=aC(chan),cid=sn.channelId||'';
+  const c=document.createElement('div');c.className='card anim-in';c.style.animationDelay=(idx%8)*30+'ms';
+  if(isShort){
+    c.innerHTML=`<div class="thumb-wrap" style="padding-bottom:177%"><img class="thumb-img" src="${th}" alt="" loading="lazy" decoding="async"/></div><div class="card-info"><div class="av" data-cid="${cid}" style="background:${bg}" title="View channel">${ini(chan)}</div><div class="meta"><div class="vtitle">${title}</div><div class="vchan">${chan}</div><div class="vstats">${fV(st.viewCount)}</div></div></div>`;
+  }else{
+    c.innerHTML=`<div class="thumb-wrap"><img class="thumb-img" src="${th}" alt="" loading="lazy" decoding="async"/></div><div class="card-info"><div class="av" data-cid="${cid}" style="background:${bg}" title="View channel">${ini(chan)}</div><div class="meta"><div class="vtitle">${title}</div><div class="vchan" data-cid="${cid}">${chan}</div><div class="vstats">${[fV(st.viewCount),pub?ago(pub):''].filter(Boolean).join(' · ')}</div></div></div>`;
+    c.querySelector('.vchan')?.addEventListener('click',e=>{e.stopPropagation();if(cid)loadChanView(cid,chan);});
+  }
+  c.querySelector('.av')?.addEventListener('click',e=>{e.stopPropagation();if(cid)loadChanView(cid,chan);});
+  return{card:c,id,v,cid};
+}
+function appendCards(videos,isShort=false,clearFirst=false){
+  const grid=document.getElementById('grid');
+  if(clearFirst)grid.innerHTML='';
+  const batch=[];
+  videos.forEach((v,i)=>{
+    const r=mkCard(v,i,isShort);
+    if(!r)return;
+    if(!isShort) r.card.addEventListener('click',()=>openVid(r.id,r.v));
+    else r.card.addEventListener('click',()=>{const allVids=spVids.length?spVids:videos;const realIdx=spVids.indexOf(r.v);openSP(realIdx>=0?realIdx:i);});
+    grid.appendChild(r.card);
+    batch.push(r.v);
+  });
+  if(batch.length)fetchAvatars(batch);
+}
+function appendChanCards(subs){
+  const grid=document.getElementById('chanGrid');
+  subs.forEach((s,i)=>{
+    const sn=s.snippet||{},cid=sn.resourceId?.channelId||'',nm=sn.title||'Channel',bg=aC(nm),th=sn.thumbnails?.medium?.url||sn.thumbnails?.default?.url||'';
+    const c=document.createElement('div');c.className='chan-card anim-in';c.style.animationDelay=i*25+'ms';
+    c.innerHTML=`<div class="chan-av-lg" style="background:${bg}">${th?`<img src="${th}" alt="" onerror="this.parentElement.innerHTML='${ini(nm)}'">`:''}${!th?ini(nm):''}</div><div class="chan-card-name">${nm}</div><div class="chan-card-subs" id="cs_${cid}">Loading…</div>`;
+    c.addEventListener('click',()=>loadChanView(cid,nm));grid.appendChild(c);
+    if(cid)yt(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${cid}&key=${API_KEY}`).then(d=>{const el=document.getElementById('cs_'+cid);const n=d.items?.[0]?.statistics?.subscriberCount;if(el)el.textContent=n?fN(n)+' subscribers':'';}).catch(()=>{});
+  });
+}
+function appendShelfCards(items){
+  const row=document.getElementById('shortsRow');
+  items.forEach((v,idx)=>{
+    const sn=v.snippet||{},id=typeof v.id==='string'?v.id:(v.id?.videoId||'');
+    if(!id)return;
+    const th=sn.thumbnails?.high?.url||sn.thumbnails?.medium?.url||'',title=sn.title||'',st=v.statistics||{};
+    const c=document.createElement('div');c.className='s-shelf-card';
+    c.innerHTML=`<div class="s-shelf-wrap"><img class="s-shelf-img" src="${th}" alt="" loading="lazy"/></div><div class="s-shelf-info"><div class="s-shelf-ttl">${title}</div><div class="s-shelf-views">${fV(st.viewCount)}</div></div>`;
+    c.addEventListener('click',()=>{spVids=items.map(i=>({...i,id:typeof i.id==='string'?i.id:(i.id?.videoId||'')}));openSP(idx);});
+    row.appendChild(c);
+  });
+}
+
+// ══ HOME (varied feed) ══
+const CATS=['','10','20','23','17','28','22','15'];
+async function goHome(){
+  curMode='home';curQuery='';nextPage='';hasMore=false;
+  document.getElementById('searchBox').value='';
+  clearPage();document.getElementById('chipsBar').style.display='flex';showView('grid');
+  document.getElementById('grid').innerHTML='<div class="loader"><div class="spinner"></div></div>';
+  loading=true;
+  try{
+    if(S.shortsHome==='true')loadShelfShorts();
+    // Varied feed: pick random category, fetch 50, shuffle, take perPage
+    const cat=CATS[Math.floor(Math.random()*CATS.length)];
+    const catP=cat?`&videoCategoryId=${cat}`:'';
+    const d=await yt(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=50&regionCode=${S.region}${catP}&key=${API_KEY}`);
+    const items=shuffle(d.items||[]).slice(0,parseInt(S.perPage));
+    document.getElementById('grid').innerHTML='';
+    appendCards(items);setScroll(d.nextPageToken);
+  }catch(e){document.getElementById('grid').innerHTML=mkEmpty(e.message,'error_outline');showToast('Could not load videos',e.message,'error',true);}
+  finally{loading=false;}
+}
+async function loadShelfShorts(){
+  const shelf=document.getElementById('shortsShelf'),row=document.getElementById('shortsRow');
+  shelf.style.display='block';row.innerHTML='';
+  try{
+    const d=await yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=%23shorts&type=video&videoDuration=short&maxResults=12&regionCode=${S.region}&safeSearch=${S.safeSearch}&key=${API_KEY}`);
+    const items=d.items||[];const ids=items.map(i=>i.id?.videoId).filter(Boolean).join(',');
+    let sm={};if(ids){const sd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);(sd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}
+    const enriched=items.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}}));
+    appendShelfCards(enriched);if(!items.length)shelf.style.display='none';
+  }catch(_){document.getElementById('shortsShelf').style.display='none';}
+}
+
+// ══ VIEWS ══
+async function goView(v){
+  curMode=v;nextPage='';hasMore=false;
+  document.getElementById('chipsBar').style.display='none';
+  clearPage();
+  if(v==='shorts')await loadShortsPage();
+  else if(v==='subscriptions')await loadSubsPage();
+  else if(v==='liked')await loadLikedPage();
+}
+async function loadShortsPage(q=''){
+  curMode='shorts';showView('grid');
+  document.getElementById('pageHdr').style.display='flex';
+  document.getElementById('pageTitle').textContent='Shorts';
+  document.getElementById('shortsSearchWrap').style.display='block';
+  if(q)document.getElementById('shortsSearchBox').value=q;
+  document.getElementById('grid').innerHTML='<div class="loader"><div class="spinner"></div></div>';
+  loading=true;
+  try{
+    const query=q?`${q} #shorts`:'#shorts';
+    const d=await yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoDuration=short&maxResults=${S.perPage}&regionCode=${S.region}&safeSearch=${S.safeSearch}&order=${Math.random()>.5?'viewCount':'date'}&key=${API_KEY}`);
+    const items=d.items||[];const ids=items.map(i=>i.id?.videoId).filter(Boolean).join(',');
+    let sm={};if(ids){const sd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);(sd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}
+    const enriched=items.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}}));
+    spVids=enriched;document.getElementById('grid').innerHTML='';
+    appendCards(enriched,true);setScroll(d.nextPageToken);
+  }catch(e){document.getElementById('grid').innerHTML=mkEmpty(e.message,'error_outline');}
+  finally{loading=false;}
+}
+function doShortsSearch(e){e.preventDefault();const q=document.getElementById('shortsSearchBox').value.trim();if(q)loadShortsPage(q);}
+async function loadSubsPage(){
+  showView('chans');document.getElementById('pageHdr').style.display='flex';document.getElementById('pageTitle').textContent='Subscriptions';
+  if(!ACCESS_TOKEN){showView('grid');document.getElementById('grid').innerHTML=mkAuthBox('Sign in to see your subscriptions.');return;}
+  loading=true;
+  try{const d=await ytAuth('https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&order=alphabetical');appendChanCards(d.items||[]);setScroll(d.nextPageToken);}
+  catch(e){showView('grid');document.getElementById('grid').innerHTML=mkEmpty('Could not load subscriptions.','error_outline');}
+  finally{loading=false;}
+}
+async function loadLikedPage(){
+  showView('grid');document.getElementById('pageHdr').style.display='flex';document.getElementById('pageTitle').textContent='Liked Videos';
+  if(!ACCESS_TOKEN){document.getElementById('grid').innerHTML=mkAuthBox('Sign in to see your liked videos.');return;}
+  document.getElementById('grid').innerHTML='<div class="loader"><div class="spinner"></div></div>';loading=true;
+  try{const d=await ytAuth(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&myRating=like&maxResults=${S.perPage}`);if(!d.items?.length){document.getElementById('grid').innerHTML=mkEmpty('No liked videos yet.','thumb_up');return;}appendCards(d.items||[],false,true);setScroll(d.nextPageToken);}
+  catch(e){document.getElementById('grid').innerHTML=mkEmpty(e.message,'error_outline');}
+  finally{loading=false;}
+}
+async function loadChanView(chanId,chanName){
+  curMode='channel';curChanId=chanId;curQuery='';nextPage='';hasMore=false;
+  document.getElementById('chipsBar').style.display='none';clearPage();showView('grid');
+  document.getElementById('pageHdr').style.display='flex';document.getElementById('pageTitle').textContent=chanName;
+  document.getElementById('grid').innerHTML='<div class="loader"><div class="spinner"></div></div>';loading=true;
+  try{
+    const d=await yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${chanId}&type=video&order=date&maxResults=${S.perPage}&key=${API_KEY}`);
+    const items=d.items||[];const ids=items.map(i=>i.id?.videoId).filter(Boolean).join(',');
+    let sm={};if(ids){const sd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);(sd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}
+    appendCards(items.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}})),false,true);setScroll(d.nextPageToken);
+  }catch(e){document.getElementById('grid').innerHTML=mkEmpty(e.message,'error_outline');}
+  finally{loading=false;}
+}
+
+// ══ SEARCH ══
+function doSearch(e){e.preventDefault();const q=document.getElementById('searchBox').value.trim();if(q)runQuery(q);}
+async function runQuery(q){
+  curMode='search';curQuery=q;nextPage='';hasMore=false;
+  document.getElementById('searchBox').value=q;document.title=`${q} — ViewTube`;
+  document.getElementById('chipsBar').style.display='none';clearPage();showView('grid');
+  document.getElementById('resultsHdr').style.display='block';
+  document.getElementById('grid').innerHTML='<div class="loader"><div class="spinner"></div></div>';loading=true;
+  try{
+    // Fetch regular videos and shorts in parallel
+    const [regData,shortsData]=await Promise.allSettled([
+      fetchSearch(q,''),
+      yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}+%23shorts&type=video&videoDuration=short&maxResults=4&safeSearch=${S.safeSearch}&key=${API_KEY}`)
+    ]);
+    document.getElementById('grid').innerHTML='';
+    // Show shorts shelf in search if we got some
+    if(shortsData.status==='fulfilled'&&shortsData.value.items?.length>=2){
+      const sItems=shortsData.value.items||[];const sIds=sItems.map(i=>i.id?.videoId).filter(Boolean).join(',');
+      let sm={};if(sIds){try{const sd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${sIds}&key=${API_KEY}`);(sd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}catch(_){}}
+      const sEnriched=sItems.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}}));
+      // mini shorts shelf
+      const shelfEl=document.getElementById('shortsShelf');const rowEl=document.getElementById('shortsRow');
+      shelfEl.style.display='block';rowEl.innerHTML='';
+      appendShelfCards(sEnriched);
+    }
+    document.getElementById('resultsHdr').textContent=`Results for "${q}"`;
+    if(regData.status==='fulfilled'){appendCards(regData.value.items);setScroll(regData.value.nextPage);}
+    else{document.getElementById('grid').innerHTML=mkEmpty(regData.reason?.message||'Search failed','error_outline');}
+  }catch(e){document.getElementById('grid').innerHTML=mkEmpty(e.message,'error_outline');showToast('Search failed',e.message,'error',true);}
+  finally{loading=false;}
+}
+async function fetchSearch(q,pt){
+  const tk=pt?`&pageToken=${pt}`:'';
+  const sd=await yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(q)}&type=video&maxResults=${S.perPage}&order=relevance&safeSearch=${S.safeSearch}${tk}&key=${API_KEY}`);
+  const items=sd.items||[];const ids=items.map(i=>i.id?.videoId).filter(Boolean).join(',');
+  let sm={};if(ids){const vd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);(vd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}
+  return{items:items.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}})),nextPage:sd.nextPageToken||''};
+}
+
+// ══ LOAD MORE ══
+async function loadMore(){
+  if(loading||!hasMore||!nextPage)return;
+  loading=true;showBL();
+  try{
+    if(curMode==='home'){
+      const d=await yt(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&chart=mostPopular&maxResults=${S.perPage}&regionCode=${S.region}&pageToken=${nextPage}&key=${API_KEY}`);
+      appendCards(shuffle(d.items||[]).slice(0,parseInt(S.perPage)));setScroll(d.nextPageToken);
+    }else if(curMode==='search'){const r=await fetchSearch(curQuery,nextPage);appendCards(r.items);setScroll(r.nextPage);}
+    else if(curMode==='shorts'){
+      const q=document.getElementById('shortsSearchBox').value.trim();
+      const query=q?`${q} #shorts`:'#shorts';
+      const d=await yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&q=${encodeURIComponent(query)}&type=video&videoDuration=short&maxResults=${S.perPage}&pageToken=${nextPage}&key=${API_KEY}`);
+      const items=d.items||[];const ids=items.map(i=>i.id?.videoId).filter(Boolean).join(',');
+      let sm={};if(ids){const sd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);(sd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}
+      const enriched=items.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}}));
+      spVids=[...spVids,...enriched];appendCards(enriched,true);setScroll(d.nextPageToken);
+    }else if(curMode==='channel'){
+      const d=await yt(`https://www.googleapis.com/youtube/v3/search?part=snippet&channelId=${curChanId}&type=video&order=date&maxResults=${S.perPage}&pageToken=${nextPage}&key=${API_KEY}`);
+      const items=d.items||[];const ids=items.map(i=>i.id?.videoId).filter(Boolean).join(',');
+      let sm={};if(ids){const sd=await yt(`https://www.googleapis.com/youtube/v3/videos?part=statistics&id=${ids}&key=${API_KEY}`);(sd.items||[]).forEach(v=>{sm[v.id]=v.statistics;});}
+      appendCards(items.map(i=>({...i,id:i.id?.videoId,statistics:sm[i.id?.videoId]||{}})));setScroll(d.nextPageToken);
+    }else if(curMode==='liked'){
+      const d=await ytAuth(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics&myRating=like&maxResults=${S.perPage}&pageToken=${nextPage}`);
+      appendCards(d.items||[]);setScroll(d.nextPageToken);
+    }else if(curMode==='subscriptions'){
+      const d=await ytAuth(`https://www.googleapis.com/youtube/v3/subscriptions?part=snippet&mine=true&maxResults=50&order=alphabetical&pageToken=${nextPage}`);
+      appendChanCards(d.items||[]);setScroll(d.nextPageToken);
+    }
+  }catch(e){hideBL();hasMore=false;}finally{loading=false;}
+}
+
+// ═══════════════════════════════════════════
+//  SHORTS PLAYER
+// ═══════════════════════════════════════════
+function openSP(idx){
+  spIdx=idx;
+  document.getElementById('sp').classList.add('open');
+  document.body.style.overflow='hidden';
+  renderSP(spIdx,'');
+  document.addEventListener('keydown',spKey);
+  const ov=document.getElementById('sp');
+  ov.addEventListener('wheel',spWheel,{passive:false});
+  let ty=0;
+  ov.addEventListener('touchstart',e=>{ty=e.touches[0].clientY;},{passive:true});
+  ov.addEventListener('touchend',e=>{const d=ty-e.changedTouches[0].clientY;if(Math.abs(d)>40)spNav(d>0?1:-1);},{passive:true});
+}
+function closeSP(){document.getElementById('sp').classList.remove('open');document.getElementById('spBox').innerHTML='';document.body.style.overflow='';document.removeEventListener('keydown',spKey);}
+function spKey(e){if(e.key==='Escape')closeSP();else if(e.key==='ArrowDown')spNav(1);else if(e.key==='ArrowUp')spNav(-1);}
+let spWc=false;
+function spWheel(e){e.preventDefault();if(spWc)return;spWc=true;spNav(e.deltaY>0?1:-1);setTimeout(()=>{spWc=false;},500);}
+async function spNav(dir){
+  if(spGoing)return;
+  const ni=spIdx+dir;
+  if(ni<0)return;
+  if(ni>=spVids.length-3&&hasMore&&!loading)loadMore();
+  if(ni>=spVids.length){if(!hasMore)showToast('End of Shorts','No more to load!','info',false);return;}
+  spGoing=true;
+  const box=document.getElementById('spBox');
+  const ec=dir===1?'sp-exit-up':'sp-exit-down',nc=dir===1?'sp-enter-up':'sp-enter-down';
+  box.classList.add(ec);
+  await new Promise(r=>setTimeout(r,200));
+  box.classList.remove(ec);spIdx=ni;
+  renderSP(spIdx,nc);
+  setTimeout(()=>{box.classList.add(nc);setTimeout(()=>{box.classList.remove(nc);spGoing=false;},320);},40);
+  document.getElementById('spPrev').disabled=spIdx===0;
+}
+function renderSP(idx){
+  const v=spVids[idx];if(!v)return;
+  const sn=v.snippet||{},st=v.statistics||{},id=v.id||'',chan=sn.channelTitle||'',cid=sn.channelId||'',bg=aC(chan);
+  spVid=id;spVidComments=parseInt(st.commentCount||0);spChanId=cid;
+  document.getElementById('spTitle').textContent=sn.title||'';
+  document.getElementById('spChan').textContent=chan;
+  document.getElementById('spLikes').textContent=st.likeCount?fN(st.likeCount):'Like';
+  document.getElementById('spComments').textContent=st.commentCount?fN(st.commentCount):'Comments';
+  document.getElementById('spCounter').textContent=`${idx+1} / ${spVids.length}`;
+  document.getElementById('spProg').style.width=spVids.length>1?Math.round((idx/(spVids.length-1))*100)+'%':'0%';
+  document.getElementById('spPrev').disabled=idx===0;
+  document.getElementById('spSub').className='sp-sub';document.getElementById('spSub').textContent='Subscribe';
+  document.getElementById('spLikeBtn').classList.remove('on');
+  // Channel avatar
+  const avEl=document.getElementById('spAv');
+  const cc=chanCache.get(cid);
+  if(cc?.thumb){avEl.innerHTML=`<img src="${cc.thumb}" alt="">`;avEl.style.background='transparent';}
+  else{avEl.innerHTML=`<span style="font-size:15px;font-weight:700;color:#fff">${ini(chan)}</span>`;avEl.style.background=bg;if(cid)fetchAvatars([v]).then(()=>{const c2=chanCache.get(cid);if(c2?.thumb){avEl.innerHTML=`<img src="${c2.thumb}" alt="">`;avEl.style.background='transparent';}}).catch(()=>{});}
+  const ap=S.autoplay==='true'?1:0;
+  const box=document.getElementById('spBox');
+  document.getElementById('spLoad').style.display='flex';
+  box.innerHTML=`<iframe src="https://www.youtube.com/embed/${id}?autoplay=${ap}&rel=0&modestbranding=1" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen onload="document.getElementById('spLoad').style.display='none'"></iframe>`;
+}
+function spGoChannel(){if(spChanId){const nm=document.getElementById('spChan').textContent;closeSP();loadChanView(spChanId,nm);}}
+function spSubscribe(){if(!ACCESS_TOKEN){showToast('Sign in to subscribe','','info',false);return;}const btn=document.getElementById('spSub');btn.textContent='Subscribed ✓';btn.className='sp-sub on';showToast('Subscribed!',`Now subscribed to ${document.getElementById('spChan').textContent}.`,'success',false);}
+function spLike(){if(!ACCESS_TOKEN){showToast('Sign in to like','','info',false);return;}document.getElementById('spLikeBtn').classList.toggle('on');showToast(document.getElementById('spLikeBtn').classList.contains('on')?'Liked!':'Like removed','','success',false);}
+function spDislike(btn){btn.classList.toggle('on');showToast('Noted','','info',false);}
+function spShare(){const u=`https://youtu.be/${spVid}`;if(navigator.share)navigator.share({url:u});else navigator.clipboard.writeText(u).then(()=>showToast('Link copied!',u,'success',false));}
+function spYT(){window.open(`https://www.youtube.com/shorts/${spVid}`,'_blank');}
+
+// ═══════════════════════════════════════════
+//  COMMENTS PANEL
+// ═══════════════════════════════════════════
+function openComments(videoId, commentCount, isShorts=false){
+  if(!videoId)return;
+  cmtsVid=videoId;cmtsNext='';cmtsForShorts=isShorts;
+  const ct=document.getElementById('cmtsCount');
+  ct.textContent=commentCount?fN(commentCount)+' comments':'';
+  document.getElementById('cmtsBody').innerHTML=`<div style="display:flex;justify-content:center;padding:40px"><div class="spinner"></div></div>`;
+  document.getElementById('cmtsPanel').classList.add('open');
+  document.getElementById('cmtsBd').classList.add('open');
+  if(!isShorts)document.body.style.overflow='hidden';
+  loadComments();
+}
+function closeComments(){
+  document.getElementById('cmtsPanel').classList.remove('open');
+  document.getElementById('cmtsBd').classList.remove('open');
+  if(!cmtsForShorts)document.body.style.overflow='';
+  cmtsVid='';
+}
+async function reloadComments(){cmtsNext='';document.getElementById('cmtsBody').innerHTML='';await loadComments();}
+async function loadComments(append=false){
+  if(cmtsLoading||!cmtsVid)return;
+  cmtsLoading=true;
+  try{
+    const sort=document.getElementById('cmtsSort').value;
+    const tk=cmtsNext?`&pageToken=${cmtsNext}`:'';
+    const d=await yt(`https://www.googleapis.com/youtube/v3/commentThreads?part=snippet,replies&videoId=${cmtsVid}&maxResults=20&order=${sort}${tk}&key=${API_KEY}`);
+    cmtsNext=d.nextPageToken||'';
+    const body=document.getElementById('cmtsBody');
+    if(!append)body.innerHTML='';
+    if(!d.items?.length&&!append){body.innerHTML=`<div class="cmts-empty"><span class="material-icons">chat_bubble_outline</span><p>No comments available.<br>Comments may be turned off.</p></div>`;return;}
+    d.items.forEach(t=>renderCmt(t,body));
+    // Remove old load more btn
+    const old=body.querySelector('.cmts-load-more');if(old)old.remove();
+    if(cmtsNext){const btn=document.createElement('button');btn.className='cmts-load-more';btn.textContent='Load more comments';btn.onclick=()=>{btn.textContent='Loading…';btn.disabled=true;loadComments(true);};body.appendChild(btn);}
+  }catch(e){
+    const body=document.getElementById('cmtsBody');
+    body.innerHTML=`<div class="cmts-empty"><span class="material-icons">block</span><p>${e.message.includes('disabled')||e.message.includes('403')?'Comments are disabled for this video.':e.message}</p></div>`;
+  }finally{cmtsLoading=false;}
+}
+function renderCmt(thread, container, isReply=false){
+  const c=thread.snippet?.topLevelComment?.snippet||thread.snippet||{};
+  const txt=(c.textDisplay||'').replace(/<br\s*\/?>/gi,'\n').replace(/<[^>]*>/g,'');
+  const name=c.authorDisplayName||'Anonymous',avUrl=c.authorProfileImageUrl||'',likes=c.likeCount||0,time=c.publishedAt?ago(c.publishedAt):'',bg=aC(name);
+  const replyCnt=thread.snippet?.totalReplyCount||0;
+  const replies=thread.replies?.comments||[];
+  const el=document.createElement('div');el.className='cmt';
+  el.innerHTML=`<div class="cmt-av">${avUrl?`<img src="${avUrl}" alt="" onerror="this.parentElement.innerHTML='${ini(name)}'">`:''}${!avUrl?ini(name):''}</div><div class="cmt-body"><div class="cmt-meta"><span class="cmt-author">${name}</span><span class="cmt-time">${time}</span></div><div class="cmt-text">${txt}</div><div class="cmt-actions"><button class="cmt-like"><span class="material-icons">thumb_up</span>${likes?fN(likes):''}</button>${replyCnt>0&&!isReply?`<button class="cmt-replies-btn" onclick="toggleReplies(this,'${thread.id||''}')"><span class="material-icons" style="font-size:14px;vertical-align:middle">expand_more</span> ${replyCnt} ${replyCnt===1?'reply':'replies'}</button>`:''}</div>${replies.length&&!isReply?`<div class="cmt-replies" id="replies_${thread.id||''}">${replies.slice(0,3).map(r=>{const rc=r.snippet||{};const rt=rc.textDisplay?.replace(/<[^>]*>/g,'')||'',rn=rc.authorDisplayName||'',rav=rc.authorProfileImageUrl||'',rbg=aC(rn);return`<div class="cmt" style="padding:8px 0"><div class="cmt-av" style="width:28px;height:28px;font-size:11px;flex-shrink:0">${rav?`<img src="${rav}" alt="" style="width:100%;height:100%;object-fit:cover;border-radius:50%">`:''}${!rav?ini(rn):''}</div><div class="cmt-body"><div class="cmt-meta"><span class="cmt-author">${rn}</span><span class="cmt-time">${rc.publishedAt?ago(rc.publishedAt):''}</span></div><div class="cmt-text">${rt}</div></div></div>`}).join('')}</div>`:''}</div>`;
+  if(avUrl)el.querySelector('.cmt-av').style.background='transparent';else el.querySelector('.cmt-av').style.background=bg;
+  container.appendChild(el);
+}
+function toggleReplies(btn,tid){const div=document.getElementById('replies_'+tid);if(!div)return;const open=div.classList.toggle('open');btn.innerHTML=open?`<span class="material-icons" style="font-size:14px;vertical-align:middle">expand_less</span> Hide replies`:`<span class="material-icons" style="font-size:14px;vertical-align:middle">expand_more</span> View replies`;}
+
+// ═══════════════════════════════════════════
+//  VIDEO MODAL
+// ═══════════════════════════════════════════
+async function openVid(videoId, videoData){
+  if(!videoId)return;
+  curVid=videoId;curVidComments=0;
+  const sn=videoData.snippet||{},chan=sn.channelTitle||'',cid=sn.channelId||'',bg=aC(chan);
+  const pub=sn.publishedAt?new Date(sn.publishedAt).toLocaleDateString('en-US',{year:'numeric',month:'long',day:'numeric'}):'';
+  document.getElementById('playerBox').innerHTML=`<div class="ply-load"><div class="spinner" style="width:40px;height:40px"></div><span>Loading…</span></div>`;
+  document.getElementById('mTitle').textContent=sn.title||'';
+  document.getElementById('mDesc').textContent=sn.description||'No description.';
+  document.getElementById('mDesc').classList.remove('open');
+  document.getElementById('mStats').textContent='';
+  document.getElementById('likeLabel').textContent='Like';
+  document.getElementById('likeBtn').classList.remove('on');
+  document.getElementById('cmtBtn').innerHTML='<span class="material-icons">chat_bubble_outline</span><span>Comments</span>';
+  const cc=chanCache.get(cid);
+  const avHtml=cc?.thumb?`<img src="${cc.thumb}" alt="">`:`<span style="font-size:19px;font-weight:700;color:#fff">${ini(chan)}</span>`;
+  document.getElementById('mChan').innerHTML=`<div class="chan-av-md" data-cid="${cid}" style="background:${cc?.thumb?'transparent':bg}" onclick="loadChanView('${cid}','${chan}');closeModal()">${avHtml}</div><div><div class="chan-nm">${chan}</div><div class="chan-subs" id="chanSubs">Loading…</div></div><button class="sub-btn" id="subBtn" onclick="handleSub('${cid}','${chan}')">Subscribe</button>`;
+  document.getElementById('overlay').classList.add('open');document.body.style.overflow='hidden';
+  try{
+    const d=await yt(`https://www.googleapis.com/youtube/v3/videos?part=snippet,statistics,status&id=${videoId}&key=${API_KEY}`);
+    const item=d.items?.[0];if(!item){document.getElementById('playerBox').innerHTML=`<div class="embed-blocked"><span class="material-icons">error_outline</span><h3>Video not found</h3></div>`;return;}
+    const s=item.statistics,emb=item.status?.embeddable!==false;
+    curVidComments=parseInt(s.commentCount||0);
+    document.getElementById('mTitle').textContent=item.snippet.title;
+    document.getElementById('mDesc').textContent=item.snippet.description||'No description.';
+    document.getElementById('likeLabel').textContent=s.likeCount?fN(s.likeCount):'Like';
+    document.getElementById('mStats').textContent=[fV(s.viewCount),pub].filter(Boolean).join(' · ');
+    if(s.commentCount){document.getElementById('cmtBtn').innerHTML=`<span class="material-icons">chat_bubble_outline</span><span>${fN(s.commentCount)}</span>`;}
+    if(emb){const ap=S.autoplay==='true'?1:0;document.getElementById('playerBox').innerHTML=`<iframe src="https://www.youtube.com/embed/${videoId}?autoplay=${ap}&rel=0" allow="accelerometer;autoplay;clipboard-write;encrypted-media;gyroscope;picture-in-picture" allowfullscreen></iframe>`;}
+    else{const hi=item.snippet.thumbnails?.maxres?.url||item.snippet.thumbnails?.high?.url||'';document.getElementById('playerBox').innerHTML=`<div class="embed-blocked">${hi?`<img src="${hi}" style="position:absolute;inset:0;width:100%;height:100%;object-fit:cover;opacity:.2"/>`:''}<span class="material-icons">videocam_off</span><h3>Embedding disabled by creator</h3><p>Watch this video directly on YouTube.</p><a class="watch-yt" href="https://www.youtube.com/watch?v=${videoId}" target="_blank"><svg width="16" height="12" viewBox="0 0 24 24" fill="#fff"><path d="M8 5v14l11-7z"/></svg>Watch on YouTube</a></div>`;}
+    if(item.snippet.channelId){
+      if(!chanCache.has(item.snippet.channelId))await fetchAvatars([item]);
+      const cc2=chanCache.get(item.snippet.channelId);
+      if(cc2?.thumb){const avEl=document.querySelector('.chan-av-md');if(avEl){avEl.innerHTML=`<img src="${cc2.thumb}" alt="">`;avEl.style.background='transparent';}}
+      yt(`https://www.googleapis.com/youtube/v3/channels?part=statistics&id=${item.snippet.channelId}&key=${API_KEY}`).then(cd=>{const el=document.getElementById('chanSubs');const n=cd.items?.[0]?.statistics?.subscriberCount;if(el)el.textContent=n?fN(n)+' subscribers':'';}).catch(()=>{});
+    }
+  }catch(e){document.getElementById('playerBox').innerHTML=`<div class="embed-blocked"><span class="material-icons">error_outline</span><h3>Could not load video</h3><p>${e.message}</p><a class="watch-yt" href="https://www.youtube.com/watch?v=${videoId}" target="_blank">Watch on YouTube</a></div>`;}
+}
+function handleSub(cid,nm){if(!ACCESS_TOKEN){showToast('Sign in to subscribe','','info',false);return;}const btn=document.getElementById('subBtn');btn.textContent='Subscribed';btn.className='sub-btn on';showToast('Subscribed!',`Now subscribed to ${nm}.`,'success',false);}
+function toggleLike(){if(!ACCESS_TOKEN){showToast('Sign in to like','','info',false);return;}document.getElementById('likeBtn').classList.toggle('on');showToast(document.getElementById('likeBtn').classList.contains('on')?'Liked!':'Like removed','','success',false);}
+function closeModal(){document.getElementById('overlay').classList.remove('open');document.getElementById('playerBox').innerHTML='';document.body.style.overflow='';curVid='';}
+function overlayClick(e){if(e.target===document.getElementById('overlay'))closeModal();}
+document.addEventListener('keydown',e=>{if(document.getElementById('sp').classList.contains('open'))return;if(e.key==='Escape'){if(document.getElementById('cmtsPanel').classList.contains('open'))closeComments();else if(document.getElementById('overlay').classList.contains('open'))closeModal();else closeSettings();}});
+function shareVideo(){const u=`https://youtu.be/${curVid}`;if(navigator.share)navigator.share({url:u,title:document.getElementById('mTitle').textContent});else navigator.clipboard.writeText(u).then(()=>showToast('Link copied!',u,'success',false));}
+function openOnYT(){window.open(`https://www.youtube.com/watch?v=${curVid}`,'_blank');}
+
+// ══ TOAST ══
+function showToast(title,msg,type='error',showSettings=true){
+  clearTimeout(toastTimer);
+  const icons={error:'error_outline',success:'check_circle',info:'info'};
+  const colors={error:'var(--red)',success:'var(--green)',info:'var(--blue)'};
+  document.getElementById('tIcon').textContent=icons[type]||icons.error;
+  document.getElementById('tIcon').style.color=colors[type]||colors.error;
+  document.getElementById('tTitle').textContent=title;
+  document.getElementById('tMsg').textContent=msg;
+  document.getElementById('tActs').innerHTML=showSettings?`<button class="t-btn p" onclick="openSettings();hideToast()">Open Settings</button><button class="t-btn s" onclick="hideToast()">Dismiss</button>`:`<button class="t-btn s" onclick="hideToast()">Dismiss</button>`;
+  document.getElementById('toast').classList.add('show');
+  toastTimer=setTimeout(hideToast,6000);
+}
+function hideToast(){document.getElementById('toast').classList.remove('show');}
+</script>
+</body>
+</html>
+    ]]></html>
+</document>
